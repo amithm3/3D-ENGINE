@@ -26,12 +26,8 @@ class Object:
         self.vectors = np.array(vectors, dtype=np.float64).reshape((len(vectors), 4, 1))
         self.initial_vectors = np.array(self.vectors)
 
-        center = np.array(self.vectors[0])
-        le = len(self.vectors)
-        for v in range(1, le):
-            center += self.vectors[v]
-        center /= le
-        center[3] = 0
+        center = np.mean(self.vectors, axis=0)
+        center[3][0] = 0
 
         self.vectors = self.vectors - center
         self.initial_vectors = self.initial_vectors - center
