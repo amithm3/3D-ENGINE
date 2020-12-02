@@ -22,7 +22,7 @@ class Camera:
 
 class Object:
     def __init__(self, vectors, faces):
-        vectors = [(v[0], v[1], v[2], 1) for v in vectors]
+        vectors = [[*v, 1] for v in vectors]
         self.vectors = np.array(vectors, dtype=np.float64).reshape((len(vectors), 4, 1))
         self.initial_vectors = np.array(self.vectors)
 
@@ -37,7 +37,7 @@ class Object:
 
 class Light:
     def __init__(self, location, orient, alpha, lum):
-        self.location = np.array(list(location) + [0]).reshape((4, 1))
-        self.orient = np.array(list(orient) + [0]).reshape((4, 1))
+        self.location = np.array([*location, 0]).reshape((4, 1))
+        self.orient = np.array([*orient, 0]).reshape((4, 1))
         self.alpha = alpha
         self.lum = lum
