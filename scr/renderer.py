@@ -103,10 +103,11 @@ class Object:
 
     def place(self, space, location):
         self.location = np.array(list(location) + [0]).reshape((4, 1))
+        self.space = space
+
         self.forward = np.array([0, 0, 1, 1]).reshape((4, 1))
         self.up = np.array([0, 1, 0, 1]).reshape((4, 1))
         self.right = np.array([1, 0, 0, 1]).reshape((4, 1))
-        self.space = space
 
 
 
