@@ -12,11 +12,11 @@ class Space:
         self.lights = []
 
     def add_camera(self, camera, location=(0, 0, 0), orient=(0, 0, 1)):
-        camera.place(self, location, orient)
+        camera.place(self, location, orient)    # need to write the function
         self.cameras.append(camera)
 
     def add_object(self, object, location=(0, 0, 0)):
-        object.place(self, location)
+        object.place(self, location)    # need to write the function
         self.objects.append(object)
 
     def add_light(self, location=(0, 0, 0), orient=(0, 0, 0), alpha=360, lum=1):
@@ -36,12 +36,16 @@ class Camera:
 
         self.space = None
         self.location = None
+
+        self.projection_matrix = None
+        self.camera_matrix = None
+
         self.forward = None
         self.up = None
         self.right = None
 
-        self.projection_matrix = None
-        self.camera_matrix = None
+    def place(self):
+        pass
 
 
 
@@ -60,9 +64,13 @@ class Object:
 
         self.space = None
         self.location = None
+
         self.forward = None
         self.up = None
         self.right = None
+
+    def place(self):
+        pass
 
 
 
