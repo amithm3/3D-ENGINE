@@ -12,11 +12,11 @@ class Space:
         self.lights = []
 
     def add_camera(self, camera, location=(0, 0, 0), orient=(0, 0, 1)):
-        camera.place(self, location, orient)    # need to write the function
+        camera.place(self, location, orient)
         self.cameras.append(camera)
 
     def add_object(self, object, location=(0, 0, 0)):
-        object.place(self, location)    # need to write the function
+        object.place(self, location)
         self.objects.append(object)
 
     def add_light(self, location=(0, 0, 0), orient=(0, 0, 0), alpha=360, lum=1):
@@ -44,8 +44,40 @@ class Camera:
         self.up = None
         self.right = None
 
-    def place(self):
-        pass
+    def place(self, space, location, orient=(0, 0, 1)):
+        self.location = np.array([*location, 1]).reshape((4, 1))
+        self.space = space
+
+        # this is the forward direction, the direction the camera will look at initially
+        self.forward = np.array([*orient, 0]).reshape((4, 1))
+        self.forward = self.forward / np.linalg.norm(self.forward)
+        # this is the up direction
+        self.up = np.array([*np.cross(self.forward[:3],
+                                      self.forward[:3] + [[1], [0], [0]], axis=0), 0]).reshape((4, 1))
+        # if the cross product turned out to be zero, retry with another initialization
+        if self.up.all(0): self.up = np.append(np.cross(self.forward[:3],
+                                                        self.forward[:3] + [[0], [1], [0]], axis=0), 0).reshape((4, 1))
+        self.up = self.up / np.linalg.norm(self.up)
+        # this is the right direction
+        self.right = np.append(np.cross(self.up[:3], self.forward[:3], axis=0), 0).reshape((4, 1))
+
+        a = self.space.screen[1] / self.space.screen[0]    # aspect ratio - screen height / screen width
+        z = 1 / (self.z_far - self.z_near)    # pre-calculated value of z factor
+        # the projection matrix converts 3d points to 2d point(projected on to the screen)
+        # as would be seen from the screen
+        self.projection_matrix = np.array([[-2 / np.tan(np.radians(self.fov[0] / 4)) / a, 0, 0, 0],
+                                           [0, 2 / np.tan(np.radians(self.fov[1] / 4)), 0, 0],
+                                           [0, 0, -(self.z_far + self.z_near) * z, -1],
+                                           [0, 0, -2 * z * self.z_far * self.z_near, 0]])
+        # the matrix which changes the projection based on the current orientation of the camera
+        self.camera_matrix = np.array([[1, 0, 0, 0],
+                                       [0, 1, 0, 0],
+                                       [0, 0, 1, 0],
+                                       [0, 0, 0, 1]])
+
+        # changes the orientation and in turn the camera matrix, given right(x), up(y), forward(z) angles to rotate
+        # initially rotated by 0, 0, 0
+        self.oriental_rotation(0, 0, 0)    # need to still write this method
 
 
 
@@ -69,8 +101,12 @@ class Object:
         self.up = None
         self.right = None
 
-    def place(self):
-        pass
+    def place(self, space, location):
+        self.location = np.array(list(location) + [0]).reshape((4, 1))
+        self.forward = np.array([0, 0, 1, 1]).reshape((4, 1))
+        self.up = np.array([0, 1, 0, 1]).reshape((4, 1))
+        self.right = np.array([1, 0, 0, 1]).reshape((4, 1))
+        self.space = space
 
 
 
