@@ -7,6 +7,22 @@ class Space:
         self.screen = screen
         self.unit = unit
 
+        self.objects = []
+        self.cameras = []
+        self.lights = []
+
+    def add_camera(self, camera, location=(0, 0, 0), orient=(0, 0, 1)):
+        camera.place(self, location, orient)
+        self.cameras.append(camera)
+
+    def add_object(self, object, location=(0, 0, 0)):
+        object.place(self, location)
+        self.objects.append(object)
+
+    def add_light(self, location=(0, 0, 0), orient=(0, 0, 0), alpha=360, lum=1):
+        light = Light(location, orient, alpha, lum)
+        self.lights.append(light)
+
 
 
 class Camera:
@@ -17,6 +33,15 @@ class Camera:
         self.z_near = z_near
         self.shutter = shutter
         self.clarity = clarity
+
+        self.space = None
+        self.location = None
+        self.forward = None
+        self.up = None
+        self.right = None
+
+        self.projection_matrix = None
+        self.camera_matrix = None
 
 
 
@@ -32,6 +57,12 @@ class Object:
         self.vectors = self.vectors - center
         self.initial_vectors = self.initial_vectors - center
         self.faces = np.array(faces)
+
+        self.space = None
+        self.location = None
+        self.forward = None
+        self.up = None
+        self.right = None
 
 
 
