@@ -144,6 +144,41 @@ class Object:
         self.up = np.array([0, 1, 0, 1]).reshape((4, 1))
         self.right = np.array([1, 0, 0, 1]).reshape((4, 1))
 
+    def oriental_rotation(self, r, u, f):
+        r, u, f = np.radians([r, u, f])
+        self.forward_rotate(f), self.right_rotate(r), self.up_rotate(u)
+
+        rotation_matrix = np.array([self.right.transpose()[0],
+                                    self.up.transpose()[0],
+                                    self.forward.transpose()[0],
+                                    [0, 0, 0, 1]])
+
+        self.vectors = rotation_matrix @ self.initial_vectors
+
+    def forward_rotate(self, a):
+        c, s = np.cos(a), np.sin(a)
+        self.up, self.right = self.up * c + self.right * s, self.right * c - self.up * s
+
+    def right_rotate(self, a):
+        c, s = np.cos(a), np.sin(a)
+        self.forward, self.up = self.forward * c + self.up * s, self.up * c - self.forward * s
+
+    def up_rotate(self, a):
+        c, s = np.cos(a), np.sin(a)
+        self.forward, self.right = self.forward * c + self.right * s, self.right * c - self.forward * s
+
+    def oriental_translation(self, r, u, f):
+        self.forward_translate(f), self.right_translate(r), self.up_translate(u)
+
+    def forward_translate(self, m):
+        self.location += m * self.forward
+
+    def right_translate(self, m):
+        self.location += m * self.right
+
+    def up_translate(self, m):
+        self.location += m * self.up
+
 
 
 class Light:
