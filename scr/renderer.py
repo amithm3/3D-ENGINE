@@ -77,7 +77,7 @@ class Camera:
 
         # changes the orientation and in turn the camera matrix, given right(x), up(y), forward(z) angles to rotate
         # initially rotated by 0, 0, 0
-        self.oriental_rotation(0, 0, 0)    # need to still write this method
+        self.oriental_rotation(0, 0, 0)
 
     def oriental_rotation(self, r, u, f):
         r, u, f = np.radians([r, u, f])
