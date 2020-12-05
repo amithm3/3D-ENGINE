@@ -29,6 +29,7 @@ class Camera:
     def __init__(self, fov=(103, 77), z_far=100, z_near=1, shutter=1, clarity=2):
         self.fov = fov
         self.fov_cos = np.cos(np.radians(max(self.fov) / 2))
+        self.fov_tan = np.tan(np.radians(self.fov / 2))
         self.z_far = z_far
         self.z_near = z_near
         self.shutter = shutter
@@ -65,8 +66,8 @@ class Camera:
         z = 1 / (self.z_far - self.z_near)    # pre-calculated value of z factor
         # the projection matrix converts 3d points to 2d point(projected on to the screen)
         # as would be seen from the screen
-        self.projection_matrix = np.array([[-2 / np.tan(np.radians(self.fov[0] / 4)) / a, 0, 0, 0],
-                                           [0, 2 / np.tan(np.radians(self.fov[1] / 4)), 0, 0],
+        self.projection_matrix = np.array([[-2 / self.fov_tan[0] / a, 0, 0, 0],
+                                           [0, 2 / self.fov_tan[1], 0, 0],
                                            [0, 0, -(self.z_far + self.z_near) * z, -1],
                                            [0, 0, -2 * z * self.z_far * self.z_near, 0]])
         # the matrix which changes the projection based on the current orientation of the camera
