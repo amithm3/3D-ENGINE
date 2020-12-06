@@ -28,8 +28,8 @@ class Space:
 class Camera:
     def __init__(self, fov=(103, 77), z_far=100, z_near=1, shutter=1, clarity=2):
         self.fov = fov
-        self.fov_cos = np.cos(np.radians(max(self.fov) / 2))
-        self.fov_tan = np.tan(np.radians(self.fov / 2))
+        self.fov_cos = np.cos(np.radians(max(self.fov)) / 2)
+        self.fov_tan = np.tan(np.radians(self.fov) / 4)
         self.z_far = z_far
         self.z_near = z_near
         self.shutter = shutter
@@ -53,11 +53,10 @@ class Camera:
         self.forward = np.array([*orient, 0]).reshape((4, 1))
         self.forward = self.forward / np.linalg.norm(self.forward)
         # this is the up direction
-        self.up = np.array([*np.cross(self.forward[:3],
-                                      self.forward[:3] + [[1], [0], [0]], axis=0), 0]).reshape((4, 1))
+        self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[1], [0], [0]], axis=0), 0).reshape((4, 1))
         # if the cross product turned out to be zero, retry with another initialization
-        if self.up.all(0): self.up = np.append(np.cross(self.forward[:3],
-                                                        self.forward[:3] + [[0], [1], [0]], axis=0), 0).reshape((4, 1))
+        if self.up.all(0): self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[0], [1], [0]], axis=0),
+                                               0).reshape((4, 1))
         self.up = self.up / np.linalg.norm(self.up)
         # this is the right direction
         self.right = np.append(np.cross(self.up[:3], self.forward[:3], axis=0), 0).reshape((4, 1))
@@ -190,9 +189,9 @@ class Object:
         self.location = np.array(list(location) + [0]).reshape((4, 1))
         self.space = space
 
-        self.forward = np.array([0, 0, 1, 1]).reshape((4, 1))
-        self.up = np.array([0, 1, 0, 1]).reshape((4, 1))
-        self.right = np.array([1, 0, 0, 1]).reshape((4, 1))
+        self.forward = np.array([0, 0, 1, 0]).reshape((4, 1))
+        self.up = np.array([0, 1, 0, 0]).reshape((4, 1))
+        self.right = np.array([1, 0, 0, 0]).reshape((4, 1))
 
     def oriental_rotation(self, r, u, f):
         r, u, f = np.radians([r, u, f])
