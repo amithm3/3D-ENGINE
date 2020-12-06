@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 class Space:
     def __init__(self, screen=(500, 500), unit=250):
         self.screen = screen
@@ -22,7 +21,6 @@ class Space:
     def add_light(self, light, location=(0, 0, 0), orient=(0, 0, 0)):
         light.place(location, orient)
         self.lights.append(light)
-
 
 
 class Camera:
@@ -61,8 +59,8 @@ class Camera:
         # this is the right direction
         self.right = np.append(np.cross(self.up[:3], self.forward[:3], axis=0), 0).reshape((4, 1))
 
-        a = self.space.screen[1] / self.space.screen[0]    # aspect ratio - screen height / screen width
-        z = 1 / (self.z_far - self.z_near)    # pre-calculated value of z factor
+        a = self.space.screen[1] / self.space.screen[0]  # aspect ratio - screen height / screen width
+        z = 1 / (self.z_far - self.z_near)  # pre-calculated value of z factor
         # the projection matrix converts 3d points to 2d point(projected on to the screen)
         # as would be seen from the screen
         self.projection_matrix = np.array([[-2 / self.fov_tan[0] / a, 0, 0, 0],
@@ -88,7 +86,7 @@ class Camera:
             p1i, p2i, p3i = obj.vectors[obj.faces.transpose()]
             side1i, side2i = p1i[:, :3] - [p2i[:, :3], p3i[:, :3]]
             normal_i = np.cross(side1i, side2i, axis=1)
-            midi = (p1i+p2i+p3i) / 3 + obj.location
+            midi = (p1i + p2i + p3i) / 3 + obj.location
             cam_prospect_i = (midi - self.location)[:, :3]
             forward_prospect_i = np.einsum('ij,lik->lk', self.forward[:3], cam_prospect_i)
             doti = np.einsum('lij,lik->lk', normal_i, cam_prospect_i)
@@ -101,8 +99,8 @@ class Camera:
             z_buffer_i = z_buffer_i[visible_indices]
             midi = midi[visible_indices]
 
-            light_prospect_i = self.shutter*np.array([self.light_val(light, midi)
-                                                     for light in self.space.lights]).sum(axis=0)
+            light_prospect_i = self.shutter * np.array([self.light_val(light, midi)
+                                                        for light in self.space.lights]).sum(axis=0)
             light_prospect_i[light_prospect_i > 1] = 1
 
             for fi in range(len(visible_faces)):
@@ -162,7 +160,6 @@ class Camera:
 
     def up_translate(self, m):
         self.location += m * self.up
-
 
 
 class Object:
