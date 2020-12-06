@@ -90,8 +90,8 @@ class Camera:
             normal_i = np.cross(side1i, side2i, axis=1)
             midi = (p1i+p2i+p3i) / 3 + obj.location
             cam_prospect_i = (midi - self.location)[:, :3]
-            forward_prospect_i = (self.forward[:3].transpose() @ cam_prospect_i)[:, 0]
-            doti = (normal_i.transpose([0, 2, 1]) @ cam_prospect_i)[:, 0]
+            forward_prospect_i = np.einsum('ij,lik->lk', self.forward[:3], cam_prospect_i)
+            doti = np.einsum('lij,lik->lk', normal_i, cam_prospect_i)
             z_buffer_i = np.linalg.norm(cam_prospect_i, axis=1)
 
             fov_val = z_buffer_i * self.fov_cos
@@ -101,8 +101,8 @@ class Camera:
             z_buffer_i = z_buffer_i[visible_indices]
             midi = midi[visible_indices]
 
-            light_prospect_i = np.sum(self.shutter*np.array([self.light_val(light, midi)
-                                                             for light in self.space.lights]), axis=0)
+            light_prospect_i = self.shutter*np.array([self.light_val(light, midi)
+                                                     for light in self.space.lights]).sum(axis=0)
             light_prospect_i[light_prospect_i > 1] = 1
 
             for fi in range(len(visible_faces)):
@@ -111,8 +111,10 @@ class Camera:
                 faces.append([[point_indexes.index(p) + len(points_cluster) for p in face],
                               light_prospect_i[fi][0], z_buffer_i[fi]])
 
-            points = ((self.projection_matrix @ self.camera_matrix) @ (obj.vectors[point_indexes] +
-                                                                       obj.location - self.location))
+            points = np.einsum('ij,jk,lkm->lim',
+                               self.projection_matrix,
+                               self.camera_matrix,
+                               obj.vectors[point_indexes] + obj.location - self.location)
             points *= self.space.unit / points[:, 3, np.newaxis]
             points_cluster.extend(points)
             faces_cluster.extend(faces)
