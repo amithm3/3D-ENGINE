@@ -129,26 +129,24 @@ class Camera:
         return l_val
 
     def oriental_rotation(self, r, u, f):
-        r, u, f = np.radians([r, u, f])
-        self.forward_rotate(f), self.right_rotate(r), self.up_rotate(u)
+        angles = np.radians([r, u, f])
+        c, s = np.cos(angles), np.sin(angles)
+        self.forward_rotate(c[2], s[2]), self.right_rotate(c[0], s[0]), self.up_rotate(c[1], s[1])
 
-        rotation_matrix = np.array([self.right.transpose()[0],
-                                    self.up.transpose()[0],
-                                    self.forward.transpose()[0],
-                                    [0, 0, 0, 1]])
+        rotation_matrix = [self.right.transpose()[0],
+                           self.up.transpose()[0],
+                           self.forward.transpose()[0],
+                           [0, 0, 0, 1]]
 
         self.camera_matrix = rotation_matrix
 
-    def forward_rotate(self, a):
-        c, s = np.cos(a), np.sin(a)
+    def forward_rotate(self, c, s):
         self.up, self.right = self.up * c + self.right * s, self.right * c - self.up * s
 
-    def right_rotate(self, a):
-        c, s = np.cos(a), np.sin(a)
+    def right_rotate(self, c, s):
         self.forward, self.up = self.forward * c + self.up * s, self.up * c - self.forward * s
 
-    def up_rotate(self, a):
-        c, s = np.cos(a), np.sin(a)
+    def up_rotate(self, c, s):
         self.forward, self.right = self.forward * c + self.right * s, self.right * c - self.forward * s
 
     def oriental_translation(self, r, u, f):
@@ -194,26 +192,24 @@ class Object:
         self.right = np.array([1, 0, 0, 0]).reshape((4, 1))
 
     def oriental_rotation(self, r, u, f):
-        r, u, f = np.radians([r, u, f])
-        self.forward_rotate(f), self.right_rotate(r), self.up_rotate(u)
+        angles = np.radians([r, u, f])
+        c, s = np.cos(angles), np.sin(angles)
+        self.forward_rotate(c[2], s[2]), self.right_rotate(c[0], s[0]), self.up_rotate(c[1], s[1])
 
-        rotation_matrix = np.array([self.right.transpose()[0],
-                                    self.up.transpose()[0],
-                                    self.forward.transpose()[0],
-                                    [0, 0, 0, 1]])
+        rotation_matrix = [self.right.transpose()[0],
+                           self.up.transpose()[0],
+                           self.forward.transpose()[0],
+                           [0, 0, 0, 1]]
 
-        self.vectors = rotation_matrix @ self.initial_vectors
+        self.vectors = np.einsum('ij,ljk->lik', rotation_matrix, self.initial_vectors)
 
-    def forward_rotate(self, a):
-        c, s = np.cos(a), np.sin(a)
+    def forward_rotate(self, c, s):
         self.up, self.right = self.up * c + self.right * s, self.right * c - self.up * s
 
-    def right_rotate(self, a):
-        c, s = np.cos(a), np.sin(a)
+    def right_rotate(self, c, s):
         self.forward, self.up = self.forward * c + self.up * s, self.up * c - self.forward * s
 
-    def up_rotate(self, a):
-        c, s = np.cos(a), np.sin(a)
+    def up_rotate(self, c, s):
         self.forward, self.right = self.forward * c + self.right * s, self.right * c - self.forward * s
 
     def oriental_translation(self, r, u, f):
