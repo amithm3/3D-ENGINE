@@ -19,8 +19,8 @@ class Space:
         object.place(self, location)
         self.objects.append(object)
 
-    def add_light(self, location=(0, 0, 0), orient=(0, 0, 0), alpha=360, lum=1):
-        light = Light(location, orient, alpha, lum)
+    def add_light(self, light, location=(0, 0, 0), orient=(0, 0, 0)):
+        light.place(location, orient)
         self.lights.append(light)
 
 
@@ -185,13 +185,21 @@ class Object:
         self.up = None
         self.right = None
 
-    def place(self, space, location):
+    def place(self, space, location, orient=(0, 0, 1)):
         self.location = np.array(list(location) + [0]).reshape((4, 1))
         self.space = space
 
-        self.forward = np.array([0, 0, 1, 0]).reshape((4, 1))
-        self.up = np.array([0, 1, 0, 0]).reshape((4, 1))
-        self.right = np.array([1, 0, 0, 0]).reshape((4, 1))
+        # this is the forward direction, the direction the camera will look at initially
+        self.forward = np.array([*orient, 0]).reshape((4, 1))
+        self.forward = self.forward / np.linalg.norm(self.forward)
+        # this is the up direction
+        self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[1], [0], [0]], axis=0), 0).reshape((4, 1))
+        # if the cross product turned out to be zero, retry with another initialization
+        if self.up.all(0): self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[0], [1], [0]], axis=0),
+                                               0).reshape((4, 1))
+        self.up = self.up / np.linalg.norm(self.up)
+        # this is the right direction
+        self.right = np.append(np.cross(self.up[:3], self.forward[:3], axis=0), 0).reshape((4, 1))
 
     def oriental_rotation(self, r, u, f):
         angles = np.radians([r, u, f])
@@ -227,10 +235,14 @@ class Object:
         self.location += m * self.up
 
 
-
 class Light:
-    def __init__(self, location, orient, alpha, lum):
-        self.location = np.array([*location, 0]).reshape((4, 1))
-        self.orient = np.array([*orient, 0]).reshape((4, 1))
+    def __init__(self, alpha, lum):
         self.alpha = alpha
         self.lum = lum
+
+        self.location = None
+        self.orient = None
+
+    def place(self, location, orient):
+        self.location = np.array([*location, 0]).reshape((4, 1))
+        self.orient = np.array([*orient, 0]).reshape((4, 1))
