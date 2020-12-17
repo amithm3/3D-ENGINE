@@ -29,7 +29,7 @@ class Spawn:
 
     @staticmethod
     def parallelopiped(s, r=(1, 1), theta=0, z=None, rtype='object'):
-        if z is None: z = [1 for i in r];
+        if z is None: z = [1 for i in r]
         points, faces = [], []
         j_append = 0
         z_append = sum(z)
@@ -62,6 +62,10 @@ def main():
         camera.oriental_translation(x, y, z)
         app.draw_triangles(*camera.capture())
 
+    def rotate_cam(x, y, z):
+        camera.oriental_rotation(x, y, z)
+        app.draw_triangles(*camera.capture())
+
     def key_bind():
         app.bind("<Up>", lambda event: move_cam(0, 0.1, 0))
         app.bind("<Down>", lambda event: move_cam(0, -0.1, 0))
@@ -69,6 +73,17 @@ def main():
         app.bind("<Left>", lambda event: move_cam(-0.1, 0, 0))
         app.bind("<space>", lambda event: move_cam(0, 0, 0.1))
         app.bind("<BackSpace>", lambda event: move_cam(0, 0, -0.1))
+        app.bind('w', lambda event: rotate_cam(1, 0, 0))
+        app.bind('s', lambda event: rotate_cam(-1, 0, 0))
+        app.bind('d', lambda event: rotate_cam(0, 1, 0))
+        app.bind('a', lambda event: rotate_cam(0, -1, 0))
+        app.bind('z', lambda event: rotate_cam(0, 0, 1))
+        app.bind('<Shift-Z>', lambda event: rotate_cam(0, 0, -1))
+
+        app.bind("l", lambda event: [exec("light.lum += 1") for light in space.lights] and app.draw_triangles(
+            *camera.capture()))
+        app.bind("<Shift-L>", lambda event: [exec("light.lum -= 1") for light in space.lights] and app.draw_triangles(
+            *camera.capture()))
 
     def init():
         s = eval(app.side.get())
@@ -78,7 +93,10 @@ def main():
         global space, object, camera, light
         space = rd.Space((app.canvas.winfo_reqwidth(), app.canvas.winfo_height()))
         object = Spawn.parallelopiped(s=s, r=r, z=z)
-        camera = rd.Camera(fov=(90, 90), shutter=5, clarity=2)
+        fov = app.canvas.winfo_reqwidth(), app.canvas.winfo_reqheight()
+        fov = 180 * fov[0] / sum(fov), 180 * fov[1] / sum(fov)
+        fov = 90, 90
+        camera = rd.Camera(fov=fov, shutter=5, clarity=2)
         light = rd.Light(360, 100)
         space.add_object(object, location=(0, 0, 10.))
         space.add_camera(camera, location=(0, 0, 0.), orient=(0, 0, 1.))
@@ -89,7 +107,11 @@ def main():
 
         app.draw_triangles(*camera.capture())
 
-    app = gui.GUI((500, 500), command=lambda: init())
+        # while 1:
+        #     object.oriental_rotation(0.1, 0.2, 0.5)
+        #     app.draw_triangles(*camera.capture())
+
+    app = gui.GUI((750, 700), command=lambda: init())
 
     return app
 

@@ -4,16 +4,19 @@ import tkinter as tk
 class GUI(tk.Tk):
     def __init__(self, size=(250, 250), title='No Title', command=None, **configurations):
         self.configurations = configurations
-        self.size = size
 
         tk.Tk.__init__(self, **configurations)
+        self.resizable(0, 0)
+        if size is None:
+            size = self.maxsize()
+
+        self.size = size[0] - 100, size[1] - 100
 
         self.title(title)
-        x, y = (self.winfo_screenwidth() - self.size[0]) // 2, (self.winfo_screenheight() - self.size[1]) // 3
+        x, y = (self.winfo_screenwidth() - self.size[0]) // 2, (self.winfo_screenheight() - self.size[1]) // 4
         w, h = self.size[0], self.size[1]
         self.geometry(f"{w}x{h}+{x}+{y}")
         self.update_idletasks()
-        self.resizable(0, 0)
 
         self.canvas = tk.Canvas(self, bg='black')
         self.canvas.pack(fill='both', expand=True)

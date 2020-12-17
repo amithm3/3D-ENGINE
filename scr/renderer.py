@@ -101,7 +101,6 @@ class Camera:
 
             light_prospect_i = self.shutter * np.array([self.light_val(light, midi)
                                                         for light in self.space.lights]).sum(axis=0)
-            print(light_prospect_i)
             light_prospect_i[light_prospect_i > 1] = 1
 
             for fi in range(len(visible_faces)):
