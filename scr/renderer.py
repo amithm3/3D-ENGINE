@@ -101,6 +101,7 @@ class Camera:
 
             light_prospect_i = self.shutter * np.array([self.light_val(light, midi)
                                                         for light in self.space.lights]).sum(axis=0)
+            print(light_prospect_i)
             light_prospect_i[light_prospect_i > 1] = 1
 
             for fi in range(len(visible_faces)):
@@ -122,11 +123,10 @@ class Camera:
         return points_cluster, faces_cluster
 
     def light_val(self, light, midi):
-        l_val = 1 - (np.linalg.norm((midi - light.location), axis=1) / light.lum)
-        l_val[l_val < 0] = 0
-        l_val = l_val ** self.clarity
-        l_val = l_val / np.linalg.norm(l_val)
-        return l_val
+        d = ((midi - light.location - self.location / 5) ** (2 * self.clarity)) ** 0.5
+        d = light.lum ** 0.5 / d.sum(axis=1)
+
+        return d
 
     def oriental_rotation(self, r, u, f):
         angles = np.radians([r, u, f])
