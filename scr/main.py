@@ -100,7 +100,7 @@ def main():
         fov = app.canvas.winfo_reqwidth(), app.canvas.winfo_reqheight()
         fov = 77 * fov[0] / sum(fov), 103 * fov[1] / sum(fov)
         camera = rd.Camera(fov=fov, shutter=5, clarity=2)
-        light = rd.Light(360, 50)
+        light = rd.Light(360, 33)
         space.add_object(object, location=(0, 0, 10.))
         space.add_camera(camera, location=(0, 0, 0.), orient=(0, 0, 1.))
         space.add_light(light)
