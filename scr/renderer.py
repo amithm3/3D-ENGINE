@@ -124,6 +124,7 @@ class Camera:
     def light_val(self, light, midi):
         d = (midi - light.location) ** 2
         d = d.sum(axis=1) ** 0.5 / light.lum
+        print(d)
 
         return d
 
