@@ -99,8 +99,8 @@ class Camera:
             z_buffer_i = z_buffer_i[visible_indices]
             midi = midi[visible_indices]
 
-            light_prospect_i = self.shutter * np.array([self.light_val(light, midi)
-                                                        for light in self.space.lights]).sum(axis=0)
+            light_prospect_i = np.array([self.light_val(light, midi)
+                                         for light in self.space.lights]).sum(axis=0)
             light_prospect_i[light_prospect_i > 1] = 1
 
             for fi in range(len(visible_faces)):
@@ -122,8 +122,8 @@ class Camera:
         return points_cluster, faces_cluster
 
     def light_val(self, light, midi):
-        d = ((midi - light.location - self.location / 5) ** (2 * self.clarity)) ** 0.5
-        d = light.lum ** 0.5 / d.sum(axis=1)
+        d = (midi - light.location) ** 2
+        d = d.sum(axis=1) ** 0.5 / light.lum
 
         return d
 

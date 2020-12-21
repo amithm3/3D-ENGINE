@@ -84,6 +84,10 @@ def main():
             *camera.capture()))
         app.bind("<Shift-L>", lambda event: [exec("light.lum -= 1") for light in space.lights] and app.draw_triangles(
             *camera.capture()))
+        app.bind("c", lambda event: exec("camera.clarity += 0.1") or app.draw_triangles(*camera.capture()))
+        app.bind("<Shift-C>", lambda event: exec("camera.clarity -= 0.1") or app.draw_triangles(*camera.capture()))
+        app.bind("t", lambda event: exec("camera.shutter += 0.1") or app.draw_triangles(*camera.capture()))
+        app.bind("<Shift-T>", lambda event: exec("camera.shutter -= 0.1") or app.draw_triangles(*camera.capture()))
 
     def init():
         s = eval(app.side.get())
@@ -94,10 +98,9 @@ def main():
         space = rd.Space((app.canvas.winfo_reqwidth(), app.canvas.winfo_height()))
         object = Spawn.parallelopiped(s=s, r=r, z=z)
         fov = app.canvas.winfo_reqwidth(), app.canvas.winfo_reqheight()
-        fov = 180 * fov[0] / sum(fov), 180 * fov[1] / sum(fov)
-        fov = 90, 90
+        fov = 77 * fov[0] / sum(fov), 103 * fov[1] / sum(fov)
         camera = rd.Camera(fov=fov, shutter=5, clarity=2)
-        light = rd.Light(360, 100)
+        light = rd.Light(360, 50)
         space.add_object(object, location=(0, 0, 10.))
         space.add_camera(camera, location=(0, 0, 0.), orient=(0, 0, 1.))
         space.add_light(light)

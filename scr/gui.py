@@ -45,7 +45,8 @@ class GUI(tk.Tk):
         self.canvas.update_idletasks()
         self.add_x, self.add_y = self.canvas.winfo_width() / 2, self.canvas.winfo_height() / 2
 
-    def draw_triangles(self, points_cluster, face_cluster, draw_orient=None, color=(1, 10, 255)):
+    def draw_triangles(self, points_cluster, face_cluster, draw_orient=None, color=None):
+        if color is None: color = self.winfo_rgb('peachpuff'); color = color[0] / 256, color[1] / 256, color[2] / 256
         self.canvas.delete('all')
         for face in face_cluster:
             face, shade = face[0], face[1]
