@@ -2,7 +2,7 @@ import tkinter as tk
 
 
 class GUI(tk.Tk):
-    def __init__(self, size=(250, 250), title='No Title', command=None, **configurations):
+    def __init__(self, size=(250, 250), title='No Title', model_it_command=None, **configurations):
         self.configurations = configurations
 
         tk.Tk.__init__(self, **configurations)
@@ -21,22 +21,9 @@ class GUI(tk.Tk):
         self.canvas = tk.Canvas(self, bg='black')
         self.canvas.pack(fill='both', expand=True)
 
-        self.input_frame = tk.Frame(self)
-        self.side = tk.Entry(self.input_frame)
-        self.side.grid(row=0, column=1)
-        self.side_text = tk.Label(self.input_frame, text='Side:')
-        self.side_text.grid(row=0, column=0, sticky='e')
-        self.radius = tk.Entry(self.input_frame)
-        self.radius.grid(row=1, column=1)
-        self.radius_text = tk.Label(self.input_frame, text='Radius:')
-        self.radius_text.grid(row=1, column=0, sticky='e')
-        self.separation = tk.Entry(self.input_frame)
-        self.separation.grid(row=2, column=1)
-        self.separation_text = tk.Label(self.input_frame, text='Separation:')
-        self.separation_text.grid(row=2, column=0, sticky='e')
-        self.input_frame.pack()
+        self._set_input_frame()
 
-        self.model_button = tk.Button(self, text='Model It', command=command)
+        self.model_button = tk.Button(self, text='Model It', command=model_it_command)
         self.model_button.pack()
 
         self.frame = None
@@ -44,6 +31,37 @@ class GUI(tk.Tk):
 
         self.canvas.update_idletasks()
         self.add_x, self.add_y = self.canvas.winfo_width() / 2, self.canvas.winfo_height() / 2
+
+    def _set_input_frame(self):
+        self.input_frame = tk.Frame(self)
+        self.right_frame = tk.Frame(self.input_frame)
+        self.left_frame = tk.Frame(self.input_frame)
+
+        self.fov_bar_x = tk.Scale(self.right_frame, from_=0, to=360, length=180, orient='horizontal')
+        self.fov_bar_x.grid(row=0, column=1)
+        self.fov_bar_x_text = tk.Label(self.right_frame, text='Fov X:')
+        self.fov_bar_x_text.grid(row=0, column=0, sticky='n')
+        self.fov_bar_y = tk.Scale(self.right_frame, from_=0, to=360, length=180, orient='horizontal')
+        self.fov_bar_y.grid(row=1, column=1)
+        self.fov_bar_y_text = tk.Label(self.right_frame, text='Fov Y:')
+        self.fov_bar_y_text.grid(row=1, column=0, sticky='n')
+
+        self.side = tk.Entry(self.left_frame)
+        self.side.grid(row=0, column=1)
+        self.side_text = tk.Label(self.left_frame, text='Side:')
+        self.side_text.grid(row=0, column=0, sticky='e')
+        self.radius = tk.Entry(self.left_frame)
+        self.radius.grid(row=1, column=1)
+        self.radius_text = tk.Label(self.left_frame, text='Radius:')
+        self.radius_text.grid(row=1, column=0, sticky='e')
+        self.separation = tk.Entry(self.left_frame)
+        self.separation.grid(row=2, column=1)
+        self.separation_text = tk.Label(self.left_frame, text='Separation:')
+        self.separation_text.grid(row=2, column=0, sticky='e')
+
+        self.right_frame.pack(side='right')
+        self.left_frame.pack(side='left')
+        self.input_frame.pack()
 
     def draw_triangles(self, points_cluster, face_cluster, draw_orient=None, color=None):
         if color is None: color = self.winfo_rgb('peachpuff'); color = color[0] / 256, color[1] / 256, color[2] / 256

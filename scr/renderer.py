@@ -43,6 +43,20 @@ class Camera:
         self.up = None
         self.right = None
 
+    def change_fov(self, new_fov_x, new_fov_y):
+        self.fov = new_fov_x, new_fov_y
+        self.fov_cos = np.cos(np.radians(max(self.fov)) / 2)
+        self.fov_tan = np.tan(np.radians(self.fov) / 4)
+
+        a = self.space.screen[1] / self.space.screen[0]  # aspect ratio - screen height / screen width
+        z = 1 / (self.z_far - self.z_near)  # pre-calculated value of z factor
+        # the projection matrix converts 3d points to 2d point(projected on to the screen)
+        # as would be seen from the screen
+        self.projection_matrix = np.array([[-2 / self.fov_tan[0] / a, 0, 0, 0],
+                                           [0, 2 / self.fov_tan[1], 0, 0],
+                                           [0, 0, -(self.z_far + self.z_near) * z, -1],
+                                           [0, 0, -2 * z * self.z_far * self.z_near, 0]])
+
     def place(self, space, location, orient=(0, 0, 1)):
         self.location = np.array([*location, 1]).reshape((4, 1))
         self.space = space
@@ -99,8 +113,8 @@ class Camera:
             z_buffer_i = z_buffer_i[visible_indices]
             midi = midi[visible_indices]
 
-            light_prospect_i = np.array([self.light_val(light, midi)
-                                         for light in self.space.lights]).sum(axis=0)
+            light_prospect_i = self.shutter * np.array([light.luminate(midi)
+                                                       for light in self.space.lights]).sum(axis=0)
             light_prospect_i[light_prospect_i > 1] = 1
 
             for fi in range(len(visible_faces)):
@@ -120,13 +134,6 @@ class Camera:
         faces_cluster = sorted(faces_cluster, key=lambda x: x[2], reverse=True)
 
         return points_cluster, faces_cluster
-
-    def light_val(self, light, midi):
-        d = (midi - light.location) ** 2
-        d = d.sum(axis=1) ** 0.5 / light.lum
-        print(d)
-
-        return d
 
     def oriental_rotation(self, r, u, f):
         angles = np.radians([r, u, f])
@@ -243,3 +250,9 @@ class Light:
     def place(self, location, orient):
         self.location = np.array([*location, 0]).reshape((4, 1))
         self.orient = np.array([*orient, 0]).reshape((4, 1))
+
+    def luminate(self, midi):
+        d = (midi - self.location) ** 2
+        d = d.sum(axis=1) ** 0.5 / self.lum
+
+        return d
