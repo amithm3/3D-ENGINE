@@ -77,9 +77,11 @@ def main():
 
         app.draw_triangles(*cam.capture())
 
-        while 1:
-            if app.rotate_var.get(): obj.oriental_rotation(0.1, 0.2, 0.5)
-            app.draw_triangles(*cam.capture())
+        # while 1:
+        #     if app.rotate_var.get(): obj.oriental_rotation(0.1, 0.2, 0.5)
+        #     app.draw_triangles(*cam.capture())
+        import cProfile as cp
+        cp.runctx('for i in range(1000): obj.oriental_rotation(0.1, 0.2, 0.5); app.draw_triangles(*cam.capture())', locals=locals(), globals=globals())
 
     app = gui.GUI((750, 700), model_it_command=lambda: init(), save_it_command=save_model)
     app.load_var.trace_add('write', lambda a, b, c: load_model(app.load_var.get()))
