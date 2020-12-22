@@ -3,6 +3,10 @@ import scr.renderer as rd
 import scr.generator as gn
 
 
+def save_model():
+    pass
+
+
 def main():
     def key_bind():
         app.bind("<Up>", lambda event: cam.oriental_translation(0, 0.1, 0))

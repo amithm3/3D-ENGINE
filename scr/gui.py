@@ -1,4 +1,5 @@
 import tkinter as tk
+import os
 
 
 class GUI(tk.Tk):
@@ -23,8 +24,30 @@ class GUI(tk.Tk):
 
         self._set_input_frame()
 
-        self.model_button = tk.Button(self, text='Model It', command=model_it_command)
-        self.model_button.pack()
+        self.bot_frame = tk.Frame(self)
+
+        self.model_button = tk.Button(self.bot_frame, text='Model It', command=model_it_command)
+        self.model_button.grid(row=0, column=0)
+        self.save_button = tk.Button(self.bot_frame, text='Save It', command=model_it_command)
+        self.save_button.grid(row=0, column=1)
+
+        self.load_var = tk.StringVar()
+        self.load_var.set('Load')
+        parent = os.path.dirname(os.getcwd()) + '/__data__'
+        opts = os.listdir(parent)
+        items = dict([(opt, os.listdir(parent + '/' + opt)) for opt in opts])
+        self.menubutton = tk.Menubutton(self.bot_frame, textvariable=self.load_var, indicatoron=True, relief='raised',
+                                        borderwidth=2)
+        self.topMenu = tk.Menu(self.menubutton, tearoff=False)
+        self.menubutton.configure(menu=self.topMenu)
+        for key in sorted(items.keys()):
+            menu = tk.Menu(self.topMenu)
+            self.topMenu.add_cascade(label=key, menu=menu)
+            for value in items[key]:
+                menu.add_radiobutton(label=value, variable=self.load_var, value=value)
+        self.menubutton.grid(row=0, column=2)
+
+        self.bot_frame.pack()
 
         self.frame = None
         self.hl = ''
