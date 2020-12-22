@@ -3,8 +3,8 @@ import scr.renderer as rd
 import scr.generator as gn
 import pickle
 
-global obj
-obj = None
+global loaded
+loaded = False
 
 
 def save_model(fname):
@@ -16,8 +16,11 @@ def load_model(fname):
     with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/{fname}', 'rb') as save_file:
         data = pickle.load(save_file)
 
-    global obj
+    global obj, loaded, init
     obj = rd.Object(data[0][:, :3], data[1])
+    loaded = True
+
+    init()
 
 
 def main():
@@ -42,15 +45,19 @@ def main():
         app.bind("t", lambda event: exec("cam.shutter += 0.1"))
         app.bind("<Shift-T>", lambda event: exec("cam.shutter -= 0.1"))
 
+    global init
+
     def init():
-        global space, obj, cam, light
+        global space, obj, cam, light, loaded
 
         space = rd.Space((app.canvas.winfo_reqwidth(), app.canvas.winfo_height()))
-        if obj is None:
+        if not loaded:
             s = eval(app.side.get())
             r = eval(app.radius.get())
             z = eval(app.separation.get())
             obj = gn.Spawn.parallelopiped(s=s, r=r, z=z)
+
+        loaded = False
         fov = app.canvas.winfo_width(), app.canvas.winfo_height()
         fov = 120 * fov[0] / sum(fov), 180 * fov[1] / sum(fov)
         cam = rd.Camera(fov=fov, shutter=1, clarity=1)
@@ -63,6 +70,7 @@ def main():
         app.fov_bar_y.set(cam.fov[1])
         app.fov_bar_x.configure(command=lambda event: cam.change_fov(app.fov_bar_x.get(), app.fov_bar_y.get()))
         app.fov_bar_y.configure(command=lambda event: cam.change_fov(app.fov_bar_x.get(), app.fov_bar_y.get()))
+        app.look_through.configure(command=lambda: cam.change_thresh(app.look_through_var.get()))
 
         key_bind()
         app.focus_set()
@@ -70,7 +78,7 @@ def main():
         app.draw_triangles(*cam.capture())
 
         while 1:
-            # obj.oriental_rotation(0.1, 0.2, 0.5)
+            if app.rotate_var.get(): obj.oriental_rotation(0.1, 0.2, 0.5)
             app.draw_triangles(*cam.capture())
 
     app = gui.GUI((750, 700), model_it_command=lambda: init(), save_it_command=save_model)

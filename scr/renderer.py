@@ -32,6 +32,7 @@ class Camera:
         self.z_near = z_near
         self.shutter = shutter
         self.clarity = clarity
+        self.thresh = 'doti > 0'
 
         self.space = None
         self.location = None
@@ -42,6 +43,10 @@ class Camera:
         self.forward = None
         self.up = None
         self.right = None
+
+    def change_thresh(self, val):
+        if val == 0: self.thresh = 'doti > 0'
+        else: self.thresh = 'doti <= 0'
 
     def change_fov(self, new_fov_x, new_fov_y):
         self.fov = new_fov_x, new_fov_y
@@ -107,7 +112,7 @@ class Camera:
             z_buffer_i = np.linalg.norm(cam_prospect_i, axis=1)
 
             fov_val = z_buffer_i * self.fov_cos
-            visible_indices = ((doti > 0) & (forward_prospect_i > fov_val) &
+            visible_indices = ((eval(self.thresh)) & (forward_prospect_i > fov_val) &
                                (z_buffer_i > self.z_near) & (z_buffer_i < self.z_far)).transpose()[0]
             visible_faces = obj.faces[visible_indices]
             z_buffer_i = z_buffer_i[visible_indices]
