@@ -45,10 +45,13 @@ def main():
         app.bind("t", lambda event: exec("cam.shutter += 0.1"))
         app.bind("<Shift-T>", lambda event: exec("cam.shutter -= 0.1"))
 
+        app.bind("h", lambda event: exec("app.hl='white'"))
+        app.bind("<Shift-H>", lambda event: exec("app.hl=''"))
+
     global init
 
     def init():
-        global space, obj, cam, light, loaded
+        global space, obj, cam, light, loaded, app
 
         space = rd.Space((app.canvas.winfo_reqwidth(), app.canvas.winfo_height()))
         if not loaded:
@@ -77,12 +80,13 @@ def main():
 
         app.draw_triangles(*cam.capture())
 
-        # while 1:
-        #     if app.rotate_var.get(): obj.oriental_rotation(0.1, 0.2, 0.5)
-        #     app.draw_triangles(*cam.capture())
-        import cProfile as cp
-        cp.runctx('for i in range(1000): obj.oriental_rotation(0.1, 0.2, 0.5); app.draw_triangles(*cam.capture())', locals=locals(), globals=globals())
+        while 1:
+            if app.rotate_var.get(): obj.oriental_rotation(0.1, 0.2, 0.5)
+            app.draw_triangles(*cam.capture())
+        # import cProfile as cp
+        # cp.runctx('for i in range(1000): obj.oriental_rotation(0.1, 0.2, 0.5); app.draw_triangles(*cam.capture())', locals=locals(), globals=globals())
 
+    global app
     app = gui.GUI((750, 700), model_it_command=lambda: init(), save_it_command=save_model)
     app.load_var.trace_add('write', lambda a, b, c: load_model(app.load_var.get()))
 

@@ -99,13 +99,13 @@ class GUI(tk.Tk):
         self.input_frame.pack()
 
     def draw_triangles(self, points_cluster, face_cluster, draw_orient=None, color=None):
-        if color is None: color = self.winfo_rgb('peachpuff'); color = color[0] / 256, color[1] / 256, color[2] / 256
+        if color is None: color = self.winfo_rgb('white'); color = color[0] / 256, color[1] / 256, color[2] / 256
         self.canvas.delete('all')
         for face in face_cluster:
             face, shade = face[0], face[1]
             p1, p2, p3 = points_cluster[face[0]], points_cluster[face[1]], points_cluster[face[2]]
             col = '%02x%02x%02x' % (int(shade * color[0]), int(shade * color[1]), int(shade * color[2]))
-            col = '#' + str(col)
+            col = '#' + col
             self.canvas.create_polygon(p1[0][0] + self.add_x, p1[1][0] + self.add_y,
                                        p2[0][0] + self.add_x, p2[1][0] + self.add_y,
                                        p3[0][0] + self.add_x, p3[1][0] + self.add_y,
