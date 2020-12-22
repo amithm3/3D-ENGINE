@@ -48,7 +48,7 @@ class GUI(tk.Tk):
             menu = tk.Menu(self.topMenu)
             self.topMenu.add_cascade(label=key, menu=menu)
             for value in items[key]:
-                menu.add_radiobutton(label=value, variable=self.load_var, value=value)
+                menu.add_radiobutton(label=value, variable=self.load_var, value=key+'/'+value)
         self.menubutton.grid(row=0, column=2)
 
         self.bot_frame.pack()

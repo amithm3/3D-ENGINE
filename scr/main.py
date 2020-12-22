@@ -13,7 +13,7 @@ def save_model(fname):
 
 
 def load_model(fname):
-    with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Examples/{fname}', 'rb') as save_file:
+    with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/{fname}', 'rb') as save_file:
         data = pickle.load(save_file)
 
     global obj
