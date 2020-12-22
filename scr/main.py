@@ -1,10 +1,23 @@
 import scr.gui as gui
 import scr.renderer as rd
 import scr.generator as gn
+import pickle
+
+global obj
+obj = None
 
 
-def save_model():
-    pass
+def save_model(fname):
+    with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Examples/{fname}', 'wb') as save_file:
+        pickle.dump([obj.vectors, obj.faces], save_file)
+
+
+def load_model(fname):
+    with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Examples/{fname}', 'rb') as save_file:
+        data = pickle.load(save_file)
+
+    global obj
+    obj = rd.Object(data[0][:, :3], data[1])
 
 
 def main():
@@ -32,12 +45,12 @@ def main():
     def init():
         global space, obj, cam, light
 
-        s = eval(app.side.get())
-        r = eval(app.radius.get())
-        z = eval(app.separation.get())
-
         space = rd.Space((app.canvas.winfo_reqwidth(), app.canvas.winfo_height()))
-        obj = gn.Spawn.parallelopiped(s=s, r=r, z=z)
+        if obj is None:
+            s = eval(app.side.get())
+            r = eval(app.radius.get())
+            z = eval(app.separation.get())
+            obj = gn.Spawn.parallelopiped(s=s, r=r, z=z)
         fov = app.canvas.winfo_width(), app.canvas.winfo_height()
         fov = 120 * fov[0] / sum(fov), 180 * fov[1] / sum(fov)
         cam = rd.Camera(fov=fov, shutter=1, clarity=1)
@@ -60,7 +73,8 @@ def main():
             # obj.oriental_rotation(0.1, 0.2, 0.5)
             app.draw_triangles(*cam.capture())
 
-    app = gui.GUI((750, 700), model_it_command=lambda: init())
+    app = gui.GUI((750, 700), model_it_command=lambda: init(), save_it_command=save_model)
+    app.load_var.trace_add('write', lambda a, b, c: load_model(app.load_var.get()))
 
     return app
 

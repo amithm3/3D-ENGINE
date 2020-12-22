@@ -3,7 +3,7 @@ import os
 
 
 class GUI(tk.Tk):
-    def __init__(self, size=(250, 250), title='No Title', model_it_command=None, **configurations):
+    def __init__(self, size=(250, 250), title='No Title', model_it_command=None, save_it_command=None, **configurations):
         self.configurations = configurations
 
         tk.Tk.__init__(self, **configurations)
@@ -28,8 +28,12 @@ class GUI(tk.Tk):
 
         self.model_button = tk.Button(self.bot_frame, text='Model It', command=model_it_command)
         self.model_button.grid(row=0, column=0)
-        self.save_button = tk.Button(self.bot_frame, text='Save It', command=model_it_command)
-        self.save_button.grid(row=0, column=1)
+        self.save_frame = tk.Frame(self.bot_frame)
+        self.save_button = tk.Button(self.save_frame, text='Save It', command=lambda: save_it_command(self.save_entry.get()))
+        self.save_button.pack(side='left')
+        self.save_entry = tk.Entry(self.save_frame)
+        self.save_entry.pack(side='right', fill='both', expand=True)
+        self.save_frame.grid(row=0, column=1)
 
         self.load_var = tk.StringVar()
         self.load_var.set('Load')
