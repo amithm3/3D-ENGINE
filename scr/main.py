@@ -8,7 +8,7 @@ obj = None
 
 
 def save_model(fname):
-    with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Examples/{fname}', 'wb') as save_file:
+    with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Saves/{fname}', 'wb') as save_file:
         pickle.dump([obj.vectors, obj.faces], save_file)
 
 
