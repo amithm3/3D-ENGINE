@@ -1,18 +1,13 @@
-import tkinter as tk
 import os
+import tkinter as tk
 
 
 class GUI(tk.Tk):
-    def __init__(self, size=(250, 250), title='No Title', model_it_command=None, save_it_command=None, **configurations):
+    def __init__(self, size=(750, 500), title='No Title', **configurations):
         self.configurations = configurations
-
-        tk.Tk.__init__(self, **configurations)
+        tk.Tk.__init__(self, **self.configurations)
         self.resizable(0, 0)
-        if size is None:
-            size = self.maxsize()
-
-        self.size = size[0] - 100, size[1] - 100
-
+        self.size = size
         self.title(title)
         x, y = (self.winfo_screenwidth() - self.size[0]) // 2, (self.winfo_screenheight() - self.size[1]) // 4
         w, h = self.size[0], self.size[1]
@@ -25,35 +20,31 @@ class GUI(tk.Tk):
         self._set_input_frame()
 
         self.bot_frame = tk.Frame(self)
-
-        self.model_button = tk.Button(self.bot_frame, text='Model It', command=model_it_command)
+        self.model_button = tk.Button(self.bot_frame, text='Model It')
         self.model_button.grid(row=0, column=0)
         self.save_frame = tk.Frame(self.bot_frame)
-        self.save_button = tk.Button(self.save_frame, text='Save It', command=lambda: save_it_command(self.save_entry.get()))
+        self.save_button = tk.Button(self.save_frame, text='Save It')
         self.save_button.pack(side='left')
         self.save_entry = tk.Entry(self.save_frame)
         self.save_entry.pack(side='right', fill='both', expand=True)
         self.save_frame.grid(row=0, column=1)
-
         self.load_var = tk.StringVar()
         self.load_var.set('Load')
         parent = os.path.dirname(os.getcwd()) + '/__data__'
         opts = os.listdir(parent)
         items = dict([(opt, os.listdir(parent + '/' + opt)) for opt in opts])
-        self.menubutton = tk.Menubutton(self.bot_frame, textvariable=self.load_var, indicatoron=True, relief='raised',
-                                        borderwidth=2)
-        self.topMenu = tk.Menu(self.menubutton, tearoff=False)
-        self.menubutton.configure(menu=self.topMenu)
+        self.load_button = tk.Menubutton(self.bot_frame, textvariable=self.load_var, indicatoron=True, relief='raised',
+                                         borderwidth=2)
+        self.topMenu = tk.Menu(self.load_button, tearoff=False)
+        self.load_button.configure(menu=self.topMenu)
         for key in sorted(items.keys()):
             menu = tk.Menu(self.topMenu)
             self.topMenu.add_cascade(label=key, menu=menu)
             for value in items[key]:
                 menu.add_radiobutton(label=value, variable=self.load_var, value=key+'/'+value)
-        self.menubutton.grid(row=0, column=2)
-
+        self.load_button.grid(row=0, column=2)
         self.bot_frame.pack()
 
-        self.frame = None
         self.hl = ''
 
         self.canvas.update_idletasks()
@@ -91,8 +82,8 @@ class GUI(tk.Tk):
         self.look_through.grid(row=3, column=1)
         self.rotate_var = tk.IntVar()
         self.rotate_var.set(0)
-        self.rotate = tk.Checkbutton(self.left_frame, text='Rotate', variable=self.rotate_var)
-        self.rotate.grid(row=3, column=0)
+        self.rotate_button = tk.Checkbutton(self.left_frame, text='Rotate', variable=self.rotate_var)
+        self.rotate_button.grid(row=3, column=0)
 
         self.right_frame.pack(side='right')
         self.left_frame.pack(side='left')
