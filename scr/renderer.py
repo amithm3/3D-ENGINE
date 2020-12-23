@@ -45,8 +45,10 @@ class Camera:
         self.right = None
 
     def change_thresh(self, val):
-        if val == 0: self.thresh = 'doti > 0'
-        else: self.thresh = 'doti <= 0'
+        if val == 0:
+            self.thresh = 'doti > 0'
+        else:
+            self.thresh = 'doti <= 0'
 
     def change_fov(self, new_fov_x, new_fov_y):
         self.fov = new_fov_x, new_fov_y
@@ -72,8 +74,9 @@ class Camera:
         # this is the up direction
         self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[1], [0], [0]], axis=0), 0).reshape((4, 1))
         # if the cross product turned out to be zero, retry with another initialization
-        if self.up.all(0): self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[0], [1], [0]], axis=0),
-                                               0).reshape((4, 1))
+        if self.up.all(0):
+            self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[0], [1], [0]], axis=0),
+                                0).reshape((4, 1))
         self.up = self.up / np.linalg.norm(self.up)
         # this is the right direction
         self.right = np.append(np.cross(self.up[:3], self.forward[:3], axis=0), 0).reshape((4, 1))
@@ -204,8 +207,9 @@ class Object:
         # this is the up direction
         self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[1], [0], [0]], axis=0), 0).reshape((4, 1))
         # if the cross product turned out to be zero, retry with another initialization
-        if self.up.all(0): self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[0], [1], [0]], axis=0),
-                                               0).reshape((4, 1))
+        if self.up.all(0):
+            self.up = np.append(np.cross(self.forward[:3], self.forward[:3] + [[0], [1], [0]], axis=0),
+                                0).reshape((4, 1))
         self.up = self.up / np.linalg.norm(self.up)
         # this is the right direction
         self.right = np.append(np.cross(self.up[:3], self.forward[:3], axis=0), 0).reshape((4, 1))
