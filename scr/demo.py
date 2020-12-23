@@ -2,7 +2,8 @@ import pickle
 
 import scr.generator as gn
 import scr.gui as gui
-import scr.renderer as rd
+
+rd = gn.rd
 
 
 class Main(gui.GUI):
