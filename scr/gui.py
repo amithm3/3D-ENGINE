@@ -90,7 +90,9 @@ class GUI(tk.Tk):
         self.input_frame.pack()
 
     def draw_triangles(self, points_cluster, face_cluster, draw_orient=None, color=None):
-        if color is None: color = self.winfo_rgb('white'); color = color[0] / 256, color[1] / 256, color[2] / 256
+        if color is None:
+            color = self.winfo_rgb('white')
+            color = color[0] / 256, color[1] / 256, color[2] / 256
         self.canvas.delete('all')
         for face in face_cluster:
             face, shade = face[0], face[1]
