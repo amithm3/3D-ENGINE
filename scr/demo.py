@@ -11,7 +11,7 @@ class Main(gui.GUI):
         self.model_button.configure(command=lambda: self.model_it())
         self.load_var.trace('wua', lambda *_: self.load_model(self.load_var.get()))
         self.rotate = self.rotate_var.get()
-        self.rotate_var.trace('wua', lambda *_: exec("self.rotate=self.rotate_var.get()"), {'self': self})
+        self.rotate_var.trace('wua', lambda *_: exec("self.rotate=self.rotate_var.get()", {'self': self}))
 
         self.space = None
         self.object = None
