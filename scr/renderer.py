@@ -102,6 +102,7 @@ class Camera:
     def capture(self, capture_orient=False):
         points_cluster = []
         faces_cluster = []
+        orient_cluster = []
         for obj in self.space.objects:
             faces = []
             point_indexes = []
@@ -109,6 +110,14 @@ class Camera:
             side1i, side2i = p1i[:, :3] - [p2i[:, :3], p3i[:, :3]]
             normal_i = np.cross(side1i, side2i, axis=1)
             midi = (p1i + p2i + p3i) / 3 + obj.location
+            if capture_orient:
+                orient = np.einsum('ij,jk,lkm->lim',
+                                   self.projection_matrix,
+                                   self.camera_matrix,
+                                   np.array([*(obj.rotation_matrix @ obj.initial_orient), obj.vectors.mean(axis=0)]) +
+                                   obj.location - self.location)
+                orient *= self.space.unit / orient[:, 3, np.newaxis]
+                orient_cluster.append(orient)
             cam_prospect_i = (midi - self.location)[:, :3]
             forward_prospect_i = np.einsum('ij,lik->lk', self.forward[:3], cam_prospect_i)
             doti = np.einsum('lij,lik->lk', normal_i, cam_prospect_i)
@@ -141,7 +150,7 @@ class Camera:
 
         faces_cluster = sorted(faces_cluster, key=lambda x: x[2], reverse=True)
 
-        return points_cluster, faces_cluster
+        return points_cluster, faces_cluster, orient_cluster
 
     def oriental_rotation(self, r, u, f):
         angles = np.radians([r, u, f])
@@ -196,6 +205,8 @@ class Object:
         self.forward = None
         self.up = None
         self.right = None
+        self.initial_orient = None
+        self.rotation_matrix = None
 
     def place(self, space, location, orient=(0, 0, 1)):
         self.location = np.array(list(location) + [0]).reshape((4, 1))
@@ -213,18 +224,23 @@ class Object:
         self.up = self.up / np.linalg.norm(self.up)
         # this is the right direction
         self.right = np.append(np.cross(self.up[:3], self.forward[:3], axis=0), 0).reshape((4, 1))
+        self.initial_orient = np.array([self.forward, self.up, self.right]) + [[0], [0], [0], [1]]
+        self.rotation_matrix = [[1, 0, 0, 0],
+                                [0, 1, 0, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 0, 1]]
 
     def oriental_rotation(self, r, u, f):
         angles = np.radians([r, u, f])
         c, s = np.cos(angles), np.sin(angles)
         self.forward_rotate(c[2], s[2]), self.right_rotate(c[0], s[0]), self.up_rotate(c[1], s[1])
 
-        rotation_matrix = [self.right.transpose()[0],
-                           self.up.transpose()[0],
-                           self.forward.transpose()[0],
-                           [0, 0, 0, 1]]
+        self.rotation_matrix = [self.right.transpose()[0],
+                                self.up.transpose()[0],
+                                self.forward.transpose()[0],
+                                [0, 0, 0, 1]]
 
-        self.vectors = np.einsum('ij,ljk->lik', rotation_matrix, self.initial_vectors)
+        self.vectors = np.einsum('ij,ljk->lik', self.rotation_matrix, self.initial_vectors)
 
     def forward_rotate(self, c, s):
         self.up, self.right = self.up * c + self.right * s, self.right * c - self.up * s

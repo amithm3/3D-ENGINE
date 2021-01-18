@@ -2,6 +2,7 @@ import pickle
 
 import generator as gn
 import demo_gui as gui
+import threading as td
 
 rd = gn.rd
 
@@ -22,8 +23,10 @@ class Main(gui.GUI):
         self.loaded = False
         self.srz_info = None
 
+        self.pthread = None
+
     def save_model(self, fname):
-        with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Saves/{fname}', 'wb') as save_file:
+        with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Saves/{fname}.obj', 'wb') as save_file:
             pickle.dump(self.srz_info, save_file)
 
     def load_model(self, fname):
@@ -76,10 +79,13 @@ class Main(gui.GUI):
         fov = self.canvas.winfo_width(), self.canvas.winfo_height()
         fov = 120 * fov[0] / sum(fov), 180 * fov[1] / sum(fov)
         self.camera = rd.Camera(fov=fov, shutter=1, clarity=1)
-        self.light = rd.Light(360, 33)
-        self.space.add_object(self.object, location=(0, 0, 10.))
-        self.space.add_camera(self.camera, location=(0, 0, 0.), orient=(0, 0, 1.))
-        self.space.add_light(self.light)
+        self.light = rd.Light(360, 25)
+        obj_center = self.object.vectors.mean(axis=0)
+        self.space.add_object(self.object, location=(0, 0, 0))
+        cam_d = rd.np.max(rd.np.sum(rd.np.square(self.object.vectors), axis=1)) ** 0.5
+        self.space.add_camera(self.camera,
+                              location=(obj_center[:3]).transpose()[0] + [0, -3*cam_d, 0], orient=(0, 1, 0.))
+        self.space.add_light(self.light, location=(obj_center[:3]).transpose()[0] + [0, -3*cam_d, 0])
 
         self.fov_bar_x.set(self.camera.fov[0])
         self.fov_bar_y.set(self.camera.fov[1])
@@ -95,12 +101,14 @@ class Main(gui.GUI):
 
         self.draw_triangles(*self.camera.capture())
 
-        try:
-            while 1:
-                self.object.oriental_rotation(*(rd.np.random.random(3) * self.rotate_var.get()))
-                self.draw_triangles(*self.camera.capture(self.see_orient_var.get()))
-        except gui.tk.TclError:
-            pass
+        def loop():
+            self.object.oriental_rotation(*(rd.np.random.random(3) * self.rotate_var.get()))
+            self.draw_triangles(*self.camera.capture(self.see_orient_var.get()))
+            self.after(0, loop)
+        if self.pthread is not None: self.pthread._stop()
+        self.pthread = td.Thread(target=loop)
+        self.pthread.daemon = True
+        self.pthread.start()
 
 
 if __name__ == '__main__':

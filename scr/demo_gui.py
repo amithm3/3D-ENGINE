@@ -118,9 +118,9 @@ class GUI(tk.Tk):
         for orient in orient_cluster:
             f, u, r, o = orient
 
-            self.canvas.create_line(o[0][0] + self.add_x, o[1][0] + self.add_y, o[0][0] + f[0][0] + self.add_x,
-                                    o[1][0] + f[1][0] + self.add_y, fill='white')
-            self.canvas.create_line(o[0][0] + self.add_x, o[1][0] + self.add_y, o[0][0] + u[0][0] + self.add_x,
-                                    o[1][0] + u[1][0] + self.add_y, fill='red')
-            self.canvas.create_line(o[0][0] + self.add_x, o[1][0] + self.add_y, o[0][0] + r[0][0] + self.add_x,
-                                    o[1][0] + r[1][0] + self.add_y, fill='green')
+            self.canvas.create_line(o[0][0] + self.add_x, o[1][0] + self.add_y,
+                                    f[0][0] + self.add_x, f[1][0] + self.add_y, fill='white', width=2)
+            self.canvas.create_line(o[0][0] + self.add_x, o[1][0] + self.add_y,
+                                    u[0][0] + self.add_x, u[1][0] + self.add_y, fill='red', width=2)
+            self.canvas.create_line(o[0][0] + self.add_x, o[1][0] + self.add_y,
+                                    r[0][0] + self.add_x, r[1][0] + self.add_y, fill='green', width=2)

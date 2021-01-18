@@ -34,13 +34,13 @@ class Spawn:
         j_append = 0
         z_append = sum(z)
         for i in range(len(r)):
-            z_append -= z[i]
             if i == 0:
-                pointsi, facesi = Spawn.polygon(s, theta, z_append + z[i], 'back', '', len(points), r[i])
+                pointsi, facesi = Spawn.polygon(s, theta, z_append, 'back', '', len(points), r[i])
             elif i == len(r) - 1:
-                pointsi, facesi = Spawn.polygon(s, theta, z_append + z[i], 'front', '', len(points), r[i])
+                pointsi, facesi = Spawn.polygon(s, theta, z_append, 'front', '', len(points), r[i])
             else:
-                pointsi, facesi = Spawn.polygon(s, theta, z_append + z[i], 'none', '', len(points), r[i])
+                pointsi, facesi = Spawn.polygon(s, theta, z_append, 'none', '', len(points), r[i])
+            z_append -= z[i]
 
             if i == 0:
                 pass
