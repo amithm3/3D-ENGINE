@@ -79,7 +79,7 @@ class GUI(tk.Tk):
 
         self.rotate_var = tk.IntVar()
         self.rotate_var.set(0)
-        self.rotate_button = tk.Checkbutton(self.left_frame, text='Rotate', variable=self.rotate_var)
+        self.rotate_button = tk.Checkbutton(self.left_frame, text='Turbulence', variable=self.rotate_var)
         self.rotate_button.grid(row=3, column=0)
         self.look_through_var = tk.IntVar()
         self.look_through_var.set(0)

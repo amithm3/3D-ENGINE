@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Space:
-    def __init__(self, screen=(500, 500), unit=250):
+    def __init__(self, screen, unit=250):
         self.screen = screen
         self.unit = unit
 

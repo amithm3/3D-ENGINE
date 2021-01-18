@@ -23,8 +23,6 @@ class Main(gui.GUI):
         self.loaded = False
         self.srz_info = None
 
-        self.pthread = None
-
     def save_model(self, fname):
         with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Saves/{fname}.obj', 'wb') as save_file:
             pickle.dump(self.srz_info, save_file)
@@ -102,13 +100,13 @@ class Main(gui.GUI):
         self.draw_triangles(*self.camera.capture())
 
         def loop():
-            self.object.oriental_rotation(*(rd.np.random.random(3) * self.rotate_var.get()))
-            self.draw_triangles(*self.camera.capture(self.see_orient_var.get()))
-            self.after(0, loop)
-        if self.pthread is not None: self.pthread._stop()
-        self.pthread = td.Thread(target=loop)
-        self.pthread.daemon = True
-        self.pthread.start()
+            try:
+                self.object.oriental_rotation(*(rd.np.random.random(3) * self.rotate_var.get()))
+                self.draw_triangles(*self.camera.capture(self.see_orient_var.get()))
+                self.after(0, loop)
+            except gui.tk.TclError:
+                pass
+        td.Thread(target=loop, daemon=True).start()
 
 
 if __name__ == '__main__':
