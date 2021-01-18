@@ -14,9 +14,9 @@ class Space:
         camera.place(self, location, orient)
         self.cameras.append(camera)
 
-    def add_object(self, object, location=(0, 0, 0)):
-        object.place(self, location)
-        self.objects.append(object)
+    def add_object(self, Object, location=(0, 0, 0)):
+        Object.place(self, location)
+        self.objects.append(Object)
 
     def add_light(self, light, location=(0, 0, 0), orient=(0, 0, 0)):
         light.place(location, orient)
@@ -99,7 +99,7 @@ class Camera:
         # initially rotated by 0, 0, 0
         self.oriental_rotation(0, 0, 0)
 
-    def capture(self):
+    def capture(self, capture_orient=False):
         points_cluster = []
         faces_cluster = []
         for obj in self.space.objects:
@@ -115,7 +115,7 @@ class Camera:
             z_buffer_i = np.linalg.norm(cam_prospect_i, axis=1)
 
             fov_val = z_buffer_i * self.fov_cos
-            visible_indices = ((eval(self.thresh)) & (forward_prospect_i > fov_val) &
+            visible_indices = ((eval(self.thresh, {'doti': doti})) & (forward_prospect_i > fov_val) &
                                (z_buffer_i > self.z_near) & (z_buffer_i < self.z_far)).transpose()[0]
             visible_faces = obj.faces[visible_indices]
             z_buffer_i = z_buffer_i[visible_indices]

@@ -3,7 +3,7 @@ import tkinter as tk
 
 
 class GUI(tk.Tk):
-    def __init__(self, size=(750, 500), title='No Title', **configurations):
+    def __init__(self, size=(750, 600), title='No Title', **configurations):
         self.configurations = configurations
         tk.Tk.__init__(self, **self.configurations)
         self.resizable(0, 0)
@@ -45,7 +45,7 @@ class GUI(tk.Tk):
         self.load_button.grid(row=0, column=2)
         self.bot_frame.pack()
 
-        self.hl = ''
+        self.hl = ['', 'white']
 
         self.canvas.update_idletasks()
         self.add_x, self.add_y = self.canvas.winfo_width() / 2, self.canvas.winfo_height() / 2
@@ -76,14 +76,19 @@ class GUI(tk.Tk):
         self.separation.grid(row=2, column=1)
         self.separation_text = tk.Label(self.left_frame, text='Separation:')
         self.separation_text.grid(row=2, column=0, sticky='e')
-        self.look_through_var = tk.IntVar()
-        self.look_through_var.set(0)
-        self.look_through = tk.Checkbutton(self.left_frame, text='Look Through', variable=self.look_through_var)
-        self.look_through.grid(row=3, column=1)
+
         self.rotate_var = tk.IntVar()
         self.rotate_var.set(0)
         self.rotate_button = tk.Checkbutton(self.left_frame, text='Rotate', variable=self.rotate_var)
         self.rotate_button.grid(row=3, column=0)
+        self.look_through_var = tk.IntVar()
+        self.look_through_var.set(0)
+        self.look_through = tk.Checkbutton(self.left_frame, text='Look Through', variable=self.look_through_var)
+        self.look_through.grid(row=3, column=1)
+        self.see_orient_var = tk.IntVar()
+        self.see_orient_var.set(0)
+        self.see_orient_button = tk.Checkbutton(self.left_frame, text='Show Orient', variable=self.see_orient_var)
+        self.see_orient_button.grid(row=3, column=2)
 
         self.right_frame.pack(side='right')
         self.left_frame.pack(side='left')
@@ -102,7 +107,7 @@ class GUI(tk.Tk):
             self.canvas.create_polygon(p1[0][0] + self.add_x, p1[1][0] + self.add_y,
                                        p2[0][0] + self.add_x, p2[1][0] + self.add_y,
                                        p3[0][0] + self.add_x, p3[1][0] + self.add_y,
-                                       outline=self.hl, fill=col)
+                                       outline=self.hl[0], fill=col)
 
         if draw_orient:
             self.draw_orient(draw_orient)

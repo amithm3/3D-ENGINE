@@ -1,4 +1,4 @@
-import scr.renderer as rd
+import renderer as rd
 
 np = rd.np
 
@@ -29,7 +29,7 @@ class Spawn:
     @staticmethod
     def parallelopiped(s, r=(1, 1), z=None, theta=0, rtype='object'):
         if z is None:
-            z = [1 for i in r]
+            z = [1 for _ in r]
         points, faces = [], []
         j_append = 0
         z_append = sum(z)

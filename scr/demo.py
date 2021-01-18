@@ -1,7 +1,7 @@
 import pickle
 
-import scr.generator as gn
-import scr.gui as gui
+import generator as gn
+import demo_gui as gui
 
 rd = gn.rd
 
@@ -11,8 +11,8 @@ class Main(gui.GUI):
         gui.GUI.__init__(self, title="3D-ENGINE-Demo")
         self.model_button.configure(command=lambda: self.model_it())
         self.load_var.trace('wua', lambda *_: self.load_model(self.load_var.get()))
-        self.rotate = self.rotate_var.get()
-        self.rotate_var.trace('wua', lambda *_: exec("self.rotate=self.rotate_var.get()", {'self': self}))
+
+        self.canvas.bind('<Button-1>', lambda event: self.canvas.focus_force())
 
         self.space = None
         self.object = None
@@ -55,15 +55,15 @@ class Main(gui.GUI):
         self.canvas.bind('z', lambda event: self.camera.oriental_rotation(0, 0, 1))
         self.canvas.bind('<Shift-Z>', lambda event: self.camera.oriental_rotation(0, 0, -1))
 
-        self.canvas.bind("l", lambda event: [exec("light.lum += 1") for light in self.space.lights])
-        self.canvas.bind("<Shift-L>", lambda event: [exec("light.lum -= 1") for light in self.space.lights])
+        self.canvas.bind("l", lambda event: [exec("light.lum += 1", {'light': light}) for light in self.space.lights])
+        self.canvas.bind("<Shift-L>", lambda event: [exec("light.lum -= 1", {'light': light})
+                                                     for light in self.space.lights])
         self.canvas.bind("c", lambda event: self.exec("self.camera.clarity += 0.1"))
         self.canvas.bind("<Shift-C>", lambda event: self.exec("self.camera.clarity -= 0.1"))
         self.canvas.bind("t", lambda event: self.exec("self.camera.shutter += 0.1"))
         self.canvas.bind("<Shift-T>", lambda event: self.exec("self.camera.shutter -= 0.1"))
 
-        self.canvas.bind("h", lambda event: self.exec("self.hl='white'"))
-        self.canvas.bind("<Shift-H>", lambda event: self.exec("self.hl=''"))
+        self.canvas.bind("h", lambda event: self.hl.reverse())
 
     def model_it(self):
         self.space = rd.Space((self.canvas.winfo_reqwidth(), self.canvas.winfo_height()))
@@ -95,10 +95,12 @@ class Main(gui.GUI):
 
         self.draw_triangles(*self.camera.capture())
 
-        while 1:
-            if self.rotate:
-                self.object.oriental_rotation(0.1, 0.2, 0.5)
-            self.draw_triangles(*self.camera.capture())
+        try:
+            while 1:
+                self.object.oriental_rotation(*(rd.np.random.random(3) * self.rotate_var.get()))
+                self.draw_triangles(*self.camera.capture(self.see_orient_var.get()))
+        except gui.tk.TclError:
+            pass
 
 
 if __name__ == '__main__':
