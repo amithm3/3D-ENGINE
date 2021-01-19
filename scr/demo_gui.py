@@ -46,7 +46,7 @@ class GUI(tk.Tk):
 
     def _file_handle(self):
         self.topMenu.delete(0, 'end')
-        parent = os.path.dirname(os.getcwd()) + '/__data__'
+        parent = os.getcwd() + '/__data__'
         opts = os.listdir(parent)
         items = dict([(opt, os.listdir(parent + '/' + opt)) for opt in opts])
         for key in sorted(items.keys()):

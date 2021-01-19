@@ -28,14 +28,14 @@ class Main(gui.GUI):
     def save_model(self, fname):
         if fname == '':
             return
-        with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Saves/{fname}.obj', 'wb') as save_file:
+        with open(f'{gui.os.getcwd()}/__data__/Saves/{fname}.obj', 'wb') as save_file:
             pickle.dump(self.srz_info, save_file)
         self._file_handle()
         self.load_var.set(f'Saves/{fname}.obj')
         self.save_entry.delete(0, 'end')
 
     def load_model(self, fname):
-        with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/{fname}', 'rb') as save_file:
+        with open(f'{gui.os.getcwd()}/__data__/{fname}', 'rb') as save_file:
             data = list(pickle.load(save_file))
 
         self.side.delete(0, 'end'), self.radius.delete(0, 'end'), self.separation.delete(0, 'end')
