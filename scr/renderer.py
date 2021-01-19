@@ -26,7 +26,7 @@ class Space:
 class Camera:
     def __init__(self, fov=(103, 77), z_far=100, z_near=1, shutter=1, clarity=2):
         self.fov = fov
-        self.fov_cos = np.cos(np.radians(max(self.fov)) / 2)
+        self.fov_cos = np.cos(np.radians(max(self.fov)))
         self.fov_tan = np.tan(np.radians(self.fov) / 4)
         self.z_far = z_far
         self.z_near = z_near
@@ -52,7 +52,7 @@ class Camera:
 
     def change_fov(self, new_fov_x, new_fov_y):
         self.fov = new_fov_x, new_fov_y
-        self.fov_cos = np.cos(np.radians(max(self.fov)) / 2)
+        self.fov_cos = np.cos(np.radians(max(self.fov)))
         self.fov_tan = np.tan(np.radians(self.fov) / 4)
 
         a = self.space.screen[1] / self.space.screen[0]  # aspect ratio - screen height / screen width
@@ -125,13 +125,13 @@ class Camera:
 
             fov_val = z_buffer_i * self.fov_cos
             visible_indices = ((eval(self.thresh, {'doti': doti})) & (forward_prospect_i > fov_val) &
-                               (z_buffer_i > self.z_near) & (z_buffer_i < self.z_far)).transpose()[0]
+                               (z_buffer_i > 5 * self.z_near) & (z_buffer_i < self.z_far)).transpose()[0]
             visible_faces = obj.faces[visible_indices]
             z_buffer_i = z_buffer_i[visible_indices]
             midi = midi[visible_indices]
 
             light_prospect_i = self.shutter * np.array([light.luminate(midi)
-                                                       for light in self.space.lights]).sum(axis=0)
+                                                        for light in self.space.lights]).sum(axis=0)
             light_prospect_i[light_prospect_i > 1] = 1
 
             for fi in range(len(visible_faces)):
