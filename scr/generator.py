@@ -28,7 +28,8 @@ class Spawn:
 
     @staticmethod
     def parallelopiped(s, r=(1, 1), z=None, theta=0, rtype='object'):
-        if not hasattr(r, '__iter__'): r = (r, r)
+        if not hasattr(r, '__iter__'):
+            r = (r, r)
         if not hasattr(z, '__iter__'):
             z = (z, 0)
         else:

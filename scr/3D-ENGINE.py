@@ -12,7 +12,7 @@ rd = gn.rd
 
 class Main(gui.GUI):
     def __init__(self):
-        gui.GUI.__init__(self, title="ENGINE", icon='__data__\icon.ico')
+        gui.GUI.__init__(self, title="ENGINE", icon=r'__data__\icon.ico')
 
         self.files = [('3D-OBJECT File', '*.obj')]
 
@@ -23,7 +23,7 @@ class Main(gui.GUI):
                                                    self.canvas.focus_set())
         self.load_button.configure(command=lambda: self.load_model(
             filedialog.askopenfilename(filetypes=self.files, defaultextension=self.files,
-                                       initialdir=os.getcwd()+'/__data__/Examples')) or
+                                       initialdir=os.getcwd() + '/__data__/Examples')) or
                                                    self.canvas.focus_set())
 
         self.canvas.bind('<Button-1>', lambda event: self.canvas.focus_force())
@@ -36,7 +36,8 @@ class Main(gui.GUI):
         self.loaded = False
         self.srz_info = None
 
-        if associate_file: self.load_model(associate_file)
+        if associate_file:
+            self.load_model(associate_file)
 
     def save_model(self, fpath):
         with open(fpath, 'wb') as save_file:
