@@ -1,4 +1,5 @@
 import tkinter as tk
+import os
 
 
 class GUI(tk.Tk):
@@ -10,7 +11,7 @@ class GUI(tk.Tk):
         self.size = size
         self.title(title)
         if icon is not None:
-            self.iconbitmap(icon)
+            self.iconbitmap(os.path.dirname(os.getcwd())+'/'+icon)
         x, y = (self.winfo_screenwidth() - self.size[0]) // 2, (self.winfo_screenheight() - self.size[1]) // 4
         w, h = self.size[0], self.size[1]
         self.geometry(f"{w}x{h}+{x}+{y}")

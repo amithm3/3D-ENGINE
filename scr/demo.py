@@ -1,12 +1,12 @@
 import pickle
 import sys
-import os
 from tkinter import filedialog
 
 import generator as gn
 import demo_gui as gui
 import threading as td
 
+os = gui.os
 rd = gn.rd
 
 
@@ -23,7 +23,7 @@ class Main(gui.GUI):
                                                    self.canvas.focus_set())
         self.load_button.configure(command=lambda: self.load_model(
             filedialog.askopenfilename(filetypes=self.files, defaultextension=self.files,
-                                       initialdir=os.getcwd() + '/__data__/Examples')) or
+                                       initialdir=os.path.dirname(os.getcwd()) + '/__data__/Examples')) or
                                                    self.canvas.focus_set())
 
         self.canvas.bind('<Button-1>', lambda event: self.canvas.focus_force())
