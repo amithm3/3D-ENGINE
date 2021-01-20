@@ -10,7 +10,7 @@ class GUI(tk.Tk):
         self.size = size
         self.title(title)
         if icon is not None:
-            self.iconphoto(False, tk.PhotoImage(file=icon))
+            self.iconbitmap(icon)
         x, y = (self.winfo_screenwidth() - self.size[0]) // 2, (self.winfo_screenheight() - self.size[1]) // 4
         w, h = self.size[0], self.size[1]
         self.geometry(f"{w}x{h}+{x}+{y}")

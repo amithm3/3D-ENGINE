@@ -9,7 +9,7 @@ rd = gn.rd
 
 class Main(gui.GUI):
     def __init__(self):
-        gui.GUI.__init__(self, title="ENGINE", icon='__data__\icon.gif')
+        gui.GUI.__init__(self, title="ENGINE", icon='__data__\icon.ico')
 
         self.model_button.configure(command=lambda: self.model_it())
         self.load_var_handler = lambda *_: self.load_model(self.load_var.get())
