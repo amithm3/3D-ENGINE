@@ -6,8 +6,7 @@ class GUI(tk.Tk):
     def __init__(self, size=(750, 600), title='No Title', icon=None, **configurations):
         self.configurations = configurations
         tk.Tk.__init__(self, **self.configurations)
-        self.withdraw()
-        self.after(0, self.deiconify)
+        self.attributes('-alpha', 0.0)
         self.resizable(0, 0)
         self.size = size
         self.title(title)
@@ -47,6 +46,8 @@ class GUI(tk.Tk):
 
         self.canvas.update_idletasks()
         self.add_x, self.add_y = self.canvas.winfo_width() / 2, self.canvas.winfo_height() / 2
+
+        self.after(0, self.attributes, '-alpha', 1.0)
 
     def _file_handle(self):
         self.topMenu.delete(0, 'end')
