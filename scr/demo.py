@@ -1,4 +1,7 @@
 import pickle
+import sys
+import os
+from tkinter import filedialog
 
 import generator as gn
 import demo_gui as gui
@@ -9,11 +12,19 @@ rd = gn.rd
 
 class Main(gui.GUI):
     def __init__(self):
-        gui.GUI.__init__(self, title="3D-ENGINE-Demo")
+        gui.GUI.__init__(self, title="ENGINE", icon=r'__data__\icon.ico')
+
+        self.files = [('3D-OBJECT File', '*.obj')]
+
         self.model_button.configure(command=lambda: self.model_it())
-        self.load_var_handler = lambda *_: self.load_model(self.load_var.get())
-        self.load_var_trace_id = self.load_var.trace('wua', self.load_var_handler)
-        self.save_button.configure(command=lambda: self.save_model(self.save_entry.get()) or self.canvas.focus_set())
+        self.save_button.configure(command=lambda: self.save_model(
+            filedialog.asksaveasfilename(filetypes=self.files, defaultextension=self.files,
+                                         initialfile='new_3d_object_file')) or
+                                                   self.canvas.focus_set())
+        self.load_button.configure(command=lambda: self.load_model(
+            filedialog.askopenfilename(filetypes=self.files, defaultextension=self.files,
+                                       initialdir=os.getcwd() + '/__data__/Examples')) or
+                                                   self.canvas.focus_set())
 
         self.canvas.bind('<Button-1>', lambda event: self.canvas.focus_force())
 
@@ -25,18 +36,24 @@ class Main(gui.GUI):
         self.loaded = False
         self.srz_info = None
 
-    def save_model(self, fname):
-        if fname == '':
-            return
-        with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/Saves/{fname}.obj', 'wb') as save_file:
-            pickle.dump(self.srz_info, save_file)
-        self._file_handle()
-        self.load_var.set(f'Saves/{fname}.obj')
-        self.save_entry.delete(0, 'end')
+        if associate_file:
+            self.load_model(associate_file)
 
-    def load_model(self, fname):
-        with open(f'{gui.os.path.dirname(gui.os.getcwd())}/__data__/{fname}', 'rb') as save_file:
-            data = list(pickle.load(save_file))
+    def save_model(self, fpath):
+        with open(fpath, 'wb') as save_file:
+            pickle.dump(self.srz_info, save_file)
+        self.load_button.configure(text=os.path.basename(fpath))
+        self.load_model(fpath)
+
+    def load_model(self, fpath):
+        global associate_file
+        if not associate_file:
+            with open(fpath, 'rb') as save_file:
+                data = list(pickle.load(save_file))
+        else:
+            with open(fpath, 'rb') as save_file:
+                data = list(pickle.load(save_file))
+            associate_file = ''
 
         self.side.delete(0, 'end'), self.radius.delete(0, 'end'), self.separation.delete(0, 'end')
         self.side.insert(0, data[0])
@@ -44,6 +61,7 @@ class Main(gui.GUI):
                                                                                                                  '')
         self.radius.insert(0, data[1])
         self.separation.insert(0, data[2])
+        self.load_button.configure(text=os.path.basename(fpath))
 
         self.loaded = True
         self.model_it()
@@ -79,9 +97,7 @@ class Main(gui.GUI):
         self.space = rd.Space((self.canvas.winfo_reqwidth(), self.canvas.winfo_height()))
         self.srz_info = eval(self.side.get()), eval(self.radius.get()), eval(self.separation.get())
         if not self.loaded:
-            self.load_var.trace_vdelete('wua', self.load_var_trace_id)
-            self.load_var.set('Load')
-            self.load_var.trace('wua', self.load_var_handler)
+            self.load_button.configure(text='Load')
         else:
             self.loaded = False
         self.object = gn.Spawn.parallelopiped(*self.srz_info)
@@ -121,4 +137,11 @@ class Main(gui.GUI):
 
 
 if __name__ == '__main__':
+    global associate_file
+    cmd_handle = sys.argv
+    if len(cmd_handle) > 1:
+        associate_file = cmd_handle[1]
+        os.chdir(os.path.dirname(cmd_handle[0]))
+    else:
+        associate_file = ''
     Main().mainloop()
