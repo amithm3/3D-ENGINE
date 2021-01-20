@@ -1,7 +1,7 @@
 import pickle
 
 import generator as gn
-import demo_gui as gui
+import gui as gui
 import threading as td
 
 rd = gn.rd
