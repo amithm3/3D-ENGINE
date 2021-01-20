@@ -9,7 +9,8 @@ rd = gn.rd
 
 class Main(gui.GUI):
     def __init__(self):
-        gui.GUI.__init__(self, title="3D-ENGINE-Demo")
+        gui.GUI.__init__(self, title="ENGINE", icon='__data__\icon.gif')
+
         self.model_button.configure(command=lambda: self.model_it())
         self.load_var_handler = lambda *_: self.load_model(self.load_var.get())
         self.load_var_trace_id = self.load_var.trace('wua', self.load_var_handler)

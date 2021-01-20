@@ -3,12 +3,14 @@ import tkinter as tk
 
 
 class GUI(tk.Tk):
-    def __init__(self, size=(750, 600), title='No Title', **configurations):
+    def __init__(self, size=(750, 600), title='No Title', icon=None, **configurations):
         self.configurations = configurations
         tk.Tk.__init__(self, **self.configurations)
         self.resizable(0, 0)
         self.size = size
         self.title(title)
+        if icon is not None:
+            self.iconphoto(False, tk.PhotoImage(file=icon))
         x, y = (self.winfo_screenwidth() - self.size[0]) // 2, (self.winfo_screenheight() - self.size[1]) // 4
         w, h = self.size[0], self.size[1]
         self.geometry(f"{w}x{h}+{x}+{y}")
@@ -47,7 +49,7 @@ class GUI(tk.Tk):
     def _file_handle(self):
         self.topMenu.delete(0, 'end')
         parent = os.getcwd() + '/__data__'
-        opts = os.listdir(parent)
+        opts = ['Examples', 'Saves']
         items = dict([(opt, os.listdir(parent + '/' + opt)) for opt in opts])
         for key in sorted(items.keys()):
             menu = tk.Menu(self.topMenu)
