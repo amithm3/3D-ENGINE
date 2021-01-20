@@ -52,7 +52,6 @@ class Main(gui.GUI):
         else:
             with open(fpath, 'rb') as save_file:
                 data = list(pickle.load(save_file))
-            self.load_var.set(os.path.basename(fpath))
             associate_file = ''
 
         self.side.delete(0, 'end'), self.radius.delete(0, 'end'), self.separation.delete(0, 'end')
