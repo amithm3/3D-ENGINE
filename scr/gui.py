@@ -1,4 +1,3 @@
-import os
 import tkinter as tk
 
 
@@ -28,17 +27,9 @@ class GUI(tk.Tk):
         self.save_frame = tk.Frame(self.bot_frame)
         self.save_button = tk.Button(self.save_frame, text='Save It', bg='gray')
         self.save_button.pack(side='left', padx=(5, 0))
-        self.save_entry = tk.Entry(self.save_frame)
-        self.save_entry.pack(side='right', fill='both', expand=True)
         self.save_frame.grid(row=0, column=1, padx=(0, 5))
 
-        self.load_var = tk.StringVar()
-        self.load_var.set('Load')
-        self.load_button = tk.Menubutton(self.bot_frame, textvariable=self.load_var, indicatoron=True, relief='raised',
-                                         borderwidth=2, bg='gray')
-        self.topMenu = tk.Menu(self.load_button, tearoff=False)
-        self.load_button.configure(menu=self.topMenu)
-        self._file_handle()
+        self.load_button = tk.Button(self.bot_frame, text='Load', relief='raised', bg='gray')
         self.load_button.grid(row=0, column=2, padx=5)
         self.bot_frame.pack()
 
@@ -48,17 +39,6 @@ class GUI(tk.Tk):
         self.add_x, self.add_y = self.canvas.winfo_width() / 2, self.canvas.winfo_height() / 2
 
         self.after(0, self.attributes, '-alpha', 1.0)
-
-    def _file_handle(self):
-        self.topMenu.delete(0, 'end')
-        parent = os.getcwd() + '/__data__'
-        opts = ['Examples', 'Saves']
-        items = dict([(opt, os.listdir(parent + '/' + opt)) for opt in opts])
-        for key in sorted(items.keys()):
-            menu = tk.Menu(self.topMenu)
-            self.topMenu.add_cascade(label=key, menu=menu)
-            for value in items[key]:
-                menu.add_radiobutton(label=value, variable=self.load_var, value=key + '/' + value)
 
     # args: action, index, value_if_allowed, prior_value, text, validation_type, trigger_type, widget_name
     @staticmethod
