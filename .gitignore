@@ -3,4 +3,4 @@ venv/
 __pycache__/
 build
 dist
-demo.spec
+3D-ENGINE.spec
