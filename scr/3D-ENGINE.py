@@ -122,6 +122,4 @@ class Main(gui.GUI):
 
 
 if __name__ == '__main__':
-    main = Main()
-    main.update_idletasks()
-    main.mainloop()
+    Main().mainloop()

@@ -6,6 +6,8 @@ class GUI(tk.Tk):
     def __init__(self, size=(750, 600), title='No Title', icon=None, **configurations):
         self.configurations = configurations
         tk.Tk.__init__(self, **self.configurations)
+        self.withdraw()
+        self.after(0, self.deiconify)
         self.resizable(0, 0)
         self.size = size
         self.title(title)
