@@ -1,10 +1,10 @@
 import pickle
 import sys
+import threading as td
 from tkinter import filedialog
 
-import generator as gn
 import demo_gui as gui
-import threading as td
+import generator as gn
 
 os = gui.os
 rd = gn.rd
@@ -19,6 +19,7 @@ class Main(gui.GUI):
         self.model_button.configure(command=lambda: self.model_it())
         self.save_button.configure(command=lambda: self.save_model(
             filedialog.asksaveasfilename(filetypes=self.files, defaultextension=self.files,
+                                         initialdir=os.path.dirname(os.getcwd()) + '/__data__/Saves',
                                          initialfile='new_3d_object_file')) or
                                                    self.canvas.focus_set())
         self.load_button.configure(command=lambda: self.load_model(
