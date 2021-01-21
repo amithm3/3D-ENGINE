@@ -2,7 +2,7 @@ import tkinter as tk
 
 
 class GUI(tk.Tk):
-    def __init__(self, size=(750, 600), title='No Title', icon=None, **configurations):
+    def __init__(self, size=(750, 650), title='No Title', icon=None, **configurations):
         self.configurations = configurations
         tk.Tk.__init__(self, **self.configurations)
         self.attributes('-alpha', 0.0)
@@ -23,12 +23,11 @@ class GUI(tk.Tk):
 
         self.bot_frame = tk.Frame(self)
         self.model_button = tk.Button(self.bot_frame, text='Model It', bg='gray')
-        self.model_button.grid(row=0, column=0, padx=5)
+        self.model_button.grid(row=0, column=0, padx=5, pady=10)
         self.save_frame = tk.Frame(self.bot_frame)
         self.save_button = tk.Button(self.save_frame, text='Save It', bg='gray')
         self.save_button.pack(side='left', padx=(5, 0))
         self.save_frame.grid(row=0, column=1, padx=(0, 5))
-
         self.load_button = tk.Button(self.bot_frame, text='Load', relief='raised', bg='gray')
         self.load_button.grid(row=0, column=2, padx=5)
         self.bot_frame.pack()

@@ -4,3 +4,4 @@ __pycache__/
 build
 dist
 3D-ENGINE.spec
+activate.bat
