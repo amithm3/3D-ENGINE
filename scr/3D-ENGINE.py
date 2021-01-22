@@ -1,20 +1,20 @@
+import os
 import pickle
 import sys
-import os
+import threading as td
 from tkinter import filedialog
 
 import generator as gn
 import gui as gui
-import threading as td
 
 rd = gn.rd
 
 
 class Main(gui.GUI):
     def __init__(self):
-        gui.GUI.__init__(self, title="ENGINE", icon=r'__data__\icon.ico')
+        gui.GUI.__init__(self, title="ENGINE", icon=r'__data__\assets\icon.ico')
 
-        self.files = [('3D-OBJECT File', '*.obj')]
+        self.files = [('3D-OBJECT File', '*.3dobj')]
 
         self.model_button.configure(command=lambda: self.model_it())
         self.save_button.configure(command=lambda: self.save_model(
