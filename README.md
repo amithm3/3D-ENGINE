@@ -10,7 +10,6 @@
 * #### _If using virtual environment(setup by you) run the command through it_
 * #### _Finally to see the demo run demo.py in the scr. Use the renderer.py as a library_
 ---
-
 ### Snapshots, About and How To Use
 * #### Home Page
   ![1](__data__/assets/Screenshot%20(1).png)
