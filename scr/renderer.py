@@ -24,10 +24,10 @@ class Space:
 
 
 class Camera:
-    def __init__(self, fov=(103, 77), z_far=100, z_near=1, shutter=1, clarity=2):
+    def __init__(self, fov=None, z_far=100, z_near=1, shutter=1, clarity=1):
         self.fov = fov
-        self.fov_cos = np.cos(np.radians(max(self.fov)))
-        self.fov_tan = np.tan(np.radians(self.fov) / 4)
+        self.fov_cos = None
+        self.fov_tan = None
         self.z_far = z_far
         self.z_near = z_near
         self.shutter = shutter
@@ -36,6 +36,7 @@ class Camera:
 
         self.space = None
         self.location = None
+        self.cost = 0
 
         self.projection_matrix = None
         self.camera_matrix = None
@@ -44,15 +45,18 @@ class Camera:
         self.up = None
         self.right = None
 
-    def change_thresh(self, val):
+    def thresh_set(self, val):
         if val == 0:
             self.thresh = 'doti > 0'
         else:
             self.thresh = 'doti <= 0'
 
-    def change_fov(self, new_fov_x, new_fov_y):
-        self.fov = new_fov_x, new_fov_y
-        self.fov_cos = np.cos(np.radians(max(self.fov)))
+    def fov_config(self, new_fov=None):
+        if new_fov is None:
+            self.fov = np.degrees(2 * np.arctan(np.array(self.space.screen) / 2 / self.z_near / self.space.unit))
+        else:
+            self.fov = np.array(new_fov)
+        self.fov_cos = np.cos(np.radians(self.fov + 15) / 4)
         self.fov_tan = np.tan(np.radians(self.fov) / 4)
 
         a = self.space.screen[1] / self.space.screen[0]  # aspect ratio - screen height / screen width
@@ -63,6 +67,15 @@ class Camera:
                                            [0, 2 / self.fov_tan[1], 0, 0],
                                            [0, 0, -(self.z_far + self.z_near) * z, -1],
                                            [0, 0, -2 * z * self.z_far * self.z_near, 0]])
+        # the matrix which changes the projection based on the current orientation of the camera
+        self.camera_matrix = [[1, 0, 0, 0],
+                              [0, 1, 0, 0],
+                              [0, 0, 1, 0],
+                              [0, 0, 0, 1]]
+
+        # changes the orientation and in turn the camera matrix, given right(x), up(y), forward(z) angles to rotate
+        # initially rotated by 0, 0, 0
+        self.oriental_rotation(0, 0, 0)
 
     def place(self, space, location, orient=(0, 0, 1)):
         self.location = np.array([*location, 1]).reshape((4, 1))
@@ -81,23 +94,7 @@ class Camera:
         # this is the right direction
         self.right = np.append(np.cross(self.up[:3], self.forward[:3], axis=0), 0).reshape((4, 1))
 
-        a = self.space.screen[1] / self.space.screen[0]  # aspect ratio - screen height / screen width
-        z = 1 / (self.z_far - self.z_near)  # pre-calculated value of z factor
-        # the projection matrix converts 3d points to 2d point(projected on to the screen)
-        # as would be seen from the screen
-        self.projection_matrix = np.array([[-2 / self.fov_tan[0] / a, 0, 0, 0],
-                                           [0, 2 / self.fov_tan[1], 0, 0],
-                                           [0, 0, -(self.z_far + self.z_near) * z, -1],
-                                           [0, 0, -2 * z * self.z_far * self.z_near, 0]])
-        # the matrix which changes the projection based on the current orientation of the camera
-        self.camera_matrix = np.array([[1, 0, 0, 0],
-                                       [0, 1, 0, 0],
-                                       [0, 0, 1, 0],
-                                       [0, 0, 0, 1]])
-
-        # changes the orientation and in turn the camera matrix, given right(x), up(y), forward(z) angles to rotate
-        # initially rotated by 0, 0, 0
-        self.oriental_rotation(0, 0, 0)
+        self.fov_config(self.fov)
 
     def capture(self, capture_orient=False):
         points_cluster = []
@@ -124,15 +121,19 @@ class Camera:
             z_buffer_i = np.linalg.norm(cam_prospect_i, axis=1)
 
             fov_val = z_buffer_i * self.fov_cos
-            visible_indices = ((eval(self.thresh, {'doti': doti})) & (forward_prospect_i > fov_val) &
-                               (z_buffer_i > 5 * self.z_near) & (z_buffer_i < self.z_far)).transpose()[0]
+            visible_indices = ((eval(self.thresh, {'doti': doti})) & ((forward_prospect_i > fov_val[:, [0]]) |
+                                                                      (forward_prospect_i > fov_val[:, [1]])) &
+                               (z_buffer_i > self.z_near) & (z_buffer_i < self.z_far)).transpose()[0]
             visible_faces = obj.faces[visible_indices]
+            self.cost = visible_faces.shape[0]
             z_buffer_i = z_buffer_i[visible_indices]
             midi = midi[visible_indices]
 
             light_prospect_i = self.shutter * np.array([light.luminate(midi)
                                                         for light in self.space.lights]).sum(axis=0)
+            light_prospect_i = light_prospect_i ** self.clarity / self.clarity
             light_prospect_i[light_prospect_i > 1] = 1
+            light_prospect_i[light_prospect_i < 0] = 0
 
             for fi in range(len(visible_faces)):
                 face = visible_faces[fi]
@@ -157,12 +158,10 @@ class Camera:
         c, s = np.cos(angles), np.sin(angles)
         self.forward_rotate(c[2], s[2]), self.right_rotate(c[0], s[0]), self.up_rotate(c[1], s[1])
 
-        rotation_matrix = [self.right.transpose()[0],
-                           self.up.transpose()[0],
-                           self.forward.transpose()[0],
-                           [0, 0, 0, 1]]
-
-        self.camera_matrix = rotation_matrix
+        self.camera_matrix = [self.right.transpose()[0],
+                              self.up.transpose()[0],
+                              self.forward.transpose()[0],
+                              [0, 0, 0, 1]]
 
     def forward_rotate(self, c, s):
         self.up, self.right = self.up * c + self.right * s, self.right * c - self.up * s
@@ -209,7 +208,7 @@ class Object:
         self.rotation_matrix = None
 
     def place(self, space, location, orient=(0, 0, 1)):
-        self.location = np.array(list(location) + [0]).reshape((4, 1))
+        self.location = np.array(list(location) + [0], dtype=np.float64).reshape((4, 1))
         self.space = space
 
         # this is the forward direction, the direction the camera will look at initially
@@ -278,6 +277,6 @@ class Light:
 
     def luminate(self, midi):
         d = (midi - self.location) ** 2
-        d = d.sum(axis=1) ** 0.5 / self.lum
+        d = 1 - d.sum(axis=1) ** 0.5 / self.lum * self.alpha
 
         return d
