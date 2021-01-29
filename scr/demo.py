@@ -181,4 +181,5 @@ if __name__ == '__main__':
         os.chdir(os.path.dirname(cmd_handle[0]))
     else:
         associate_file = ''
+    os.chdir(os.path.dirname(os.getcwd()))
     Main().mainloop()
