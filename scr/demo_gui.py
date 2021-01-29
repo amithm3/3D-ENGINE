@@ -1,17 +1,16 @@
-import os
 import tkinter as tk
 
 
 class GUI(tk.Tk):
-    def __init__(self, size=(750, 600), title='No Title', icon=None, **configurations):
+    def __init__(self, size=(750, 650), title='No Title', icon=None, **configurations):
         self.configurations = configurations
         tk.Tk.__init__(self, **self.configurations)
+        self.minsize(628, 408)
         self.attributes('-alpha', 0.0)
-        self.resizable(0, 0)
         self.size = size
         self.title(title)
         if icon is not None:
-            self.iconbitmap(os.path.dirname(os.getcwd())+'/'+icon)
+            self.iconbitmap(icon)
         x, y = (self.winfo_screenwidth() - self.size[0]) // 2, (self.winfo_screenheight() - self.size[1]) // 4
         w, h = self.size[0], self.size[1]
         self.geometry(f"{w}x{h}+{x}+{y}")
@@ -24,7 +23,7 @@ class GUI(tk.Tk):
 
         self.bot_frame = tk.Frame(self)
         self.model_button = tk.Button(self.bot_frame, text='Model It', bg='gray')
-        self.model_button.grid(row=0, column=0, padx=5, pady=5)
+        self.model_button.grid(row=0, column=0, padx=5, pady=10)
         self.save_frame = tk.Frame(self.bot_frame)
         self.save_button = tk.Button(self.save_frame, text='Save It', bg='gray')
         self.save_button.pack(side='left', padx=(5, 0))
@@ -36,16 +35,21 @@ class GUI(tk.Tk):
         self.hl = ['', 'white']
 
         self.canvas.update_idletasks()
-        self.add_x, self.add_y = self.canvas.winfo_width() / 2, self.canvas.winfo_height() / 2
+        self._set_offset()
 
-        self.after(0, self.attributes, '-alpha', 1.0)
+        self.after(100, self.attributes, '-alpha', 1.0)
+
+    def _set_offset(self):
+        self.add_x, self.add_y = self.canvas.winfo_width() / 2, self.canvas.winfo_height() / 2
 
     # args: action, index, value_if_allowed, prior_value, text, validation_type, trigger_type, widget_name
     @staticmethod
     def entry_validate(*args, digits=True, alpha=False, special_chars=(',', ' ', '.')):
         def check(char):
-            if digits and char.isdigit(): return True
-            if alpha and char.isalphs(): return True
+            if digits and char.isdigit():
+                return True
+            if alpha and char.isalphs():
+                return True
             if char not in special_chars:
                 return False
             else:
@@ -55,7 +59,8 @@ class GUI(tk.Tk):
             return check(args[4])
         else:
             for char in args[4]:
-                if not check(char): return False
+                if not check(char):
+                    return False
             else:
                 return True
 
@@ -73,37 +78,47 @@ class GUI(tk.Tk):
         self.fov_bar_y_text = tk.Label(self.right_frame, text='Fov Y:')
         self.fov_bar_y_text.grid(row=1, column=0, sticky='n')
 
+        self.left_frame_up = tk.Frame(self.left_frame)
+        self.left_frame_down = tk.Frame(self.left_frame)
+
         vcmd = (self.register(self.entry_validate),
                 '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
-        self.side = tk.Entry(self.left_frame, width=36, validatecommand=vcmd, validate='key')
+        self.side = tk.Entry(self.left_frame_up, width=36, validatecommand=vcmd, validate='key')
         self.side.grid(row=0, column=1)
-        self.side_text = tk.Label(self.left_frame, text='Side:')
+        self.side_text = tk.Label(self.left_frame_up, text='Side:')
         self.side_text.grid(row=0, column=0, sticky='e')
-        self.radius = tk.Entry(self.left_frame, width=36, validatecommand=vcmd, validate='key')
+        self.radius = tk.Entry(self.left_frame_up, width=36, validatecommand=vcmd, validate='key')
         self.radius.grid(row=1, column=1)
-        self.radius_text = tk.Label(self.left_frame, text='Radius:')
+        self.radius_text = tk.Label(self.left_frame_up, text='Radius:')
         self.radius_text.grid(row=1, column=0, sticky='e')
-        self.separation = tk.Entry(self.left_frame, width=36, validatecommand=vcmd, validate='key')
+        self.separation = tk.Entry(self.left_frame_up, width=36, validatecommand=vcmd, validate='key')
         self.separation.grid(row=2, column=1)
-        self.separation_text = tk.Label(self.left_frame, text='Separation:')
+        self.separation_text = tk.Label(self.left_frame_up, text='Separation:')
         self.separation_text.grid(row=2, column=0, sticky='e')
 
+        self.turb_var = tk.IntVar()
+        self.turb_var.set(0)
+        self.turb_button = tk.Checkbutton(self.left_frame_down, text='Turbulence', variable=self.turb_var)
+        self.turb_button.grid(row=0, column=0)
         self.rotate_var = tk.IntVar()
         self.rotate_var.set(0)
-        self.rotate_button = tk.Checkbutton(self.left_frame, text='Turbulence', variable=self.rotate_var)
-        self.rotate_button.grid(row=3, column=0)
+        self.rotate_button = tk.Checkbutton(self.left_frame_down, text='Rotate', variable=self.rotate_var)
+        self.rotate_button.grid(row=0, column=1)
         self.look_through_var = tk.IntVar()
         self.look_through_var.set(0)
-        self.look_through = tk.Checkbutton(self.left_frame, text='Look Through', variable=self.look_through_var)
-        self.look_through.grid(row=3, column=1)
+        self.look_through = tk.Checkbutton(self.left_frame_down, text='Look Through', variable=self.look_through_var)
+        self.look_through.grid(row=0, column=2)
         self.see_orient_var = tk.IntVar()
         self.see_orient_var.set(0)
-        self.see_orient_button = tk.Checkbutton(self.left_frame, text='Show Orient', variable=self.see_orient_var)
-        self.see_orient_button.grid(row=3, column=2)
+        self.see_orient_button = tk.Checkbutton(self.left_frame_down, text='Show Orient', variable=self.see_orient_var)
+        self.see_orient_button.grid(row=0, column=3)
+
+        self.left_frame_up.pack()
+        self.left_frame_down.pack()
 
         self.right_frame.pack(side='right')
         self.left_frame.pack(side='left')
-        self.input_frame.pack()
+        self.input_frame.pack(pady=(5, 0))
 
     def draw_triangles(self, points_cluster, face_cluster, draw_orient=None, color=None):
         if color is None:
