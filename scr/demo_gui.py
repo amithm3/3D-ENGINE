@@ -1,3 +1,4 @@
+import time as tm
 import tkinter as tk
 
 
@@ -38,6 +39,9 @@ class GUI(tk.Tk):
         self._set_offset()
 
         self.after(100, self.attributes, '-alpha', 1.0)
+
+        self.time = 0
+        self.fps = 0
 
     def _set_offset(self):
         self.add_x, self.add_y = self.canvas.winfo_width() / 2, self.canvas.winfo_height() / 2
@@ -95,6 +99,10 @@ class GUI(tk.Tk):
         self.separation.grid(row=2, column=1)
         self.separation_text = tk.Label(self.left_frame_up, text='Separation:')
         self.separation_text.grid(row=2, column=0, sticky='e')
+        self.color_text = tk.Label(self.left_frame_up, text='Color:')
+        self.color_text.grid(row=3, column=0, sticky='e')
+        self.color = tk.Entry(self.left_frame_up, width=36)
+        self.color.grid(row=3, column=1, sticky='e')
 
         self.turb_var = tk.IntVar()
         self.turb_var.set(0)
@@ -120,10 +128,12 @@ class GUI(tk.Tk):
         self.left_frame.pack(side='left')
         self.input_frame.pack(pady=(5, 0))
 
-    def draw_triangles(self, points_cluster, face_cluster, draw_orient=None, color=None):
-        if color is None:
-            color = self.winfo_rgb('white')
-            color = color[0] / 256, color[1] / 256, color[2] / 256
+    def draw_triangles(self, points_cluster, face_cluster, draw_orient=None):
+        color = self.color.get()
+        if color == '':
+            color = 'white'
+        color = self.winfo_rgb(color)
+        color = color[0] / 256, color[1] / 256, color[2] / 256
         self.canvas.delete('all')
         for face in face_cluster:
             face, shade = face[0], face[1]
@@ -138,6 +148,11 @@ class GUI(tk.Tk):
         if draw_orient:
             self.draw_orient(draw_orient)
 
+        t = tm.time() - self.time
+        if t != 0:
+            self.fps = int(1 / t)
+        self.canvas.create_text(self.canvas.winfo_width() - 5, 5, text=self.fps, fill='white', anchor='ne')
+        self.time = tm.time()
         self.canvas.update()
 
     def draw_orient(self, orient_cluster):

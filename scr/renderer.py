@@ -24,7 +24,7 @@ class Space:
 
 
 class Camera:
-    def __init__(self, fov=None, z_far=100, z_near=1, shutter=1, clarity=1):
+    def __init__(self, fov=None, z_far=1000, z_near=1, shutter=1, clarity=1):
         self.fov = fov
         self.fov_cos = None
         self.fov_tan = None
@@ -56,7 +56,7 @@ class Camera:
             self.fov = np.degrees(2 * np.arctan(np.array(self.space.screen) / 2 / self.z_near / self.space.unit))
         else:
             self.fov = np.array(new_fov)
-        self.fov_cos = np.cos(np.radians(self.fov + 15) / 4)
+        self.fov_cos = np.cos(np.radians(self.fov + 25) / 4)
         self.fov_tan = np.tan(np.radians(self.fov) / 4)
 
         a = self.space.screen[1] / self.space.screen[0]  # aspect ratio - screen height / screen width
