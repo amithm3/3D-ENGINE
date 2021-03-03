@@ -1,0 +1,7 @@
+venv/
+.idea/
+__pycache__/
+build
+dist
+3D-ENGINE.spec
+activate.bat
