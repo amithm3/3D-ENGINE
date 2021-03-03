@@ -17,7 +17,7 @@
   ![2](__data__/assets/Screenshot%20(2).png)
 * #### 3D Object is rendered
   ![3](__data__/assets/Screenshot%20(3).png)
-* #### Check turbulence for movement of the 3D Object
+* #### Check turbulence and/or rotate for movement and/or rotation of the 3D Object
   ![4](__data__/assets/Screenshot%20(4).png)
 * #### Check look through for viewing the behind scene of the 3D Object
   ![5](__data__/assets/Screenshot%20(5).png)
@@ -30,6 +30,7 @@
   - Side is the number of sides your base polygon has for the entire parallelopiped 3D Object.
   - Radius is the different size the base polygon assumes in constructing the 3D Object from bottom to top.
   - Separation is the distance from one base polygon to its successive one.
+  - Color can be a common color name or a hex code(eg: '#fff', '#aabc92', '#111222333')
     ![8.2](__data__/assets/Screenshot%20(8).png)
 * #### Wow, You made Your 3D Object, now it's time to save it
   ![9.1](__data__/assets/Screenshot%20(9).png)
@@ -42,6 +43,6 @@
   - Use UpArrow, DownArrow, LeftArrow, RightArrow key to move the Camera
   - Use 'w', 's', 'a', 'd' keys to rotate the camera in up, down, left, right directions
   - Can't see Your 3D Object clearly, or it's too bright, use 't', '<SHIFT-T>'(shutter sensitivity) or
-    'l', '<SHIFT-L>'(light source) to change lighting
+    'l', '<SHIFT-L>'(light source) or 'c', <SHIFT-C>(clarity) to change lighting
 
 # Hope You Like The App :)
