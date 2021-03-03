@@ -18,6 +18,7 @@ class Main(gui.GUI):
         self.model_button.configure(command=lambda: self.model_it())
         self.save_button.configure(command=lambda: (self.save_model(
             filedialog.asksaveasfilename(filetypes=self.files, defaultextension=self.files,
+                                         initialdir=os.getcwd() + '/__data__/Saves',
                                          initialfile='new_3d_object_file')),
                                                     self.canvas.focus_set()))
         self.load_button.configure(command=lambda: (self.load_model(
