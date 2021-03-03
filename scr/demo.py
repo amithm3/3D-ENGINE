@@ -27,8 +27,8 @@ class Main(gui.GUI):
                                                     self.canvas.focus_set()))
         self.rotate_var.trace('w', lambda *_: self.after(0, self.loop) if not self.turb_var.get() else None)
         self.turb_var.trace('w', lambda *_: self.after(0, self.loop) if not self.rotate_var.get() else None)
-        self.look_through_var.trace('w', lambda *_: (self.camera.thresh_set(self.look_through_var.get()),
-                                                     self.smart_loop()))
+        self.look_through_lambda = lambda *_: (self.camera.thresh_set(self.look_through_var.get()), self.smart_loop())
+        self.look_through_var.trace('w', self.look_through_lambda)
         self.see_orient_var.trace('w', lambda *_: self.smart_loop())
 
         self.canvas.bind('<Button-1>', lambda event: self.canvas.focus_force())
@@ -181,6 +181,7 @@ class Main(gui.GUI):
         self.light = rd.Light(1, 2.5 * rd.np.linalg.norm(location))
         self.space.add_camera(self.camera, location=location, orient=-location / rd.np.linalg.norm(location))
         self.space.add_light(self.light, location=location)
+        self.look_through_lambda()
 
         self.fov_bar_x.set(self.camera.fov[0])
         self.fov_bar_y.set(self.camera.fov[1])
