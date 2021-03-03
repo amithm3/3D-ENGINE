@@ -177,7 +177,7 @@ class Main(gui.GUI):
         obj_center = self.object.vectors.mean(axis=0).transpose()[0][:3]
         self.space.add_object(self.object, location=(0, 0, 0))
         cam_d = rd.np.max(rd.np.sum(rd.np.square(self.object.vectors), axis=1)) ** 0.5
-        location = obj_center + [0, -4 * cam_d, -5 / 2 * cam_d]
+        location = obj_center + [-5 / 2 * cam_d, -4 * cam_d, -5 / 2 * cam_d]
         self.light = rd.Light(1, 2.5 * rd.np.linalg.norm(location))
         self.space.add_camera(self.camera, location=location, orient=-location / rd.np.linalg.norm(location))
         self.space.add_light(self.light, location=location)
