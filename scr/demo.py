@@ -32,13 +32,42 @@ class Main(gui.GUI):
 
         self.canvas.bind('<Button-1>', lambda event: self.canvas.focus_force())
 
+        self.keys = {'Up': 0,
+                     'Down': 0,
+                     'Right': 0,
+                     'Left': 0,
+                     'b': 0,
+                     'space': 0,
+                     'w': 0,
+                     's': 0,
+                     'd': 0,
+                     'a': 0,
+                     'z': 0,
+                     'x': 0}
+
+        self.bind_key = {'Up': rd.np.array([0, 0.25, 0]),
+                         'Down': rd.np.array([0, -0.25, 0]),
+                         'Right': rd.np.array([0.25, 0, 0]),
+                         'Left': rd.np.array([-0.25, 0, 0]),
+                         'b': rd.np.array([0, 0, 0.25]),
+                         'space': rd.np.array([0, 0, -0.25]),
+
+                         'w': rd.np.array([0.5, 0, 0]),
+                         's': rd.np.array([-0.5, 0, 0]),
+                         'd': rd.np.array([0, 0.5, 0]),
+                         'a': rd.np.array([0, -0.5, 0]),
+                         'z': rd.np.array([0, 0, 0.5]),
+                         'x': rd.np.array([0, 0, -0.5])}
+
+        self.event_started = False
+
         self.space = None
         self.object = None
         self.camera = None
         self.light = None
 
         self.loaded = False
-        self.srz_info = None
+        self.srzc_info = None
 
         if associate_file:
             self.load_model(associate_file)
@@ -46,7 +75,7 @@ class Main(gui.GUI):
     def save_model(self, fpath):
         if fpath:
             with open(fpath, 'wb') as save_file:
-                pickle.dump(self.srz_info, save_file)
+                pickle.dump(self.srzc_info, save_file)
             self.load_button.configure(text=os.path.basename(fpath))
             self.load_model(fpath)
 
@@ -61,13 +90,14 @@ class Main(gui.GUI):
                     data = list(pickle.load(save_file))
                 associate_file = ''
 
-            self.side.delete(0, 'end'), self.radius.delete(0, 'end'), self.separation.delete(0, 'end')
+            self.side.delete(0, 'end'), self.radius.delete(0, 'end'), \
+            self.separation.delete(0, 'end'), self.color.delete(0, 'end')
             self.side.insert(0, data[0])
-            data[1], data[2] = str(data[1]).replace('(', '').replace(')', ''), str(data[2]).replace('(', '').replace(
-                ')',
-                '')
+            data[1], data[2] = str(data[1]).replace('(', '').replace(')', ''), \
+                               str(data[2]).replace('(', '').replace(')', '')
             self.radius.insert(0, data[1])
             self.separation.insert(0, data[2])
+            self.color.insert(0, data[3])
             self.load_button.configure(text=os.path.basename(fpath))
 
             self.loaded = True
@@ -81,56 +111,74 @@ class Main(gui.GUI):
         exec(expr, local)
         self.smart_loop()
 
-    def translate(self, *args):
+    def translate(self, args):
+        if self.fps > 60:
+            self.after(int(self.fps / 60))
         self.camera.oriental_translation(*args)
-        self.smart_loop()
 
-    def rotate(self, *args):
+    def rotate(self, args):
         self.camera.oriental_rotation(*args)
-        self.smart_loop()
+
+    def event(self):
+        if 1 in self.keys.values():
+            self.event_started = True
+            if self.keys['Up'] == 1 or self.keys['Down'] == 1 or self.keys['Left'] == 1 or self.keys['Right'] == 1 \
+                    or self.keys['b'] == 1 or self.keys['space'] == 1:
+                self.translate(self.keys['Up'] * self.bind_key['Up'] + self.keys['Down'] * self.bind_key['Down'] +
+                               self.keys['Left'] * self.bind_key['Left'] + self.keys['Right'] * self.bind_key['Right'] +
+                               self.keys['b'] * self.bind_key['b'] + self.keys['space'] * self.bind_key['space'])
+            if self.keys['w'] == 1 or self.keys['s'] == 1 or self.keys['a'] == 1 or self.keys['d'] == 1 \
+                    or self.keys['z'] == 1 or self.keys['x'] == 1:
+                self.rotate(self.keys['w'] * self.bind_key['w'] + self.keys['s'] * self.bind_key['s'] +
+                            self.keys['d'] * self.bind_key['d'] + self.keys['a'] * self.bind_key['a'] +
+                            self.keys['z'] * self.bind_key['z'] + self.keys['x'] * self.bind_key['x'])
+            self.smart_loop()
+            self.after(self.rotate_var.get() + self.turb_var.get(), self.event)
+        else:
+            self.event_started = False
+
+    def key_pressed(self, event):
+        if event.keysym in self.keys.keys() and not self.keys[event.keysym]:
+            self.keys[event.keysym] = 1
+        if not self.event_started:
+            self.after(0, self.event)
+
+    def key_released(self, event):
+        if event.keysym in self.keys.keys() and self.keys[event.keysym]:
+            self.keys[event.keysym] = 0
 
     def key_bind(self):
-        self.canvas.bind("<Up>", lambda event: self.translate(0, 0.2, 0))
-        self.canvas.bind("<Down>", lambda event: self.translate(0, -0.2, 0))
-        self.canvas.bind("<Right>", lambda event: self.translate(0.2, 0, 0))
-        self.canvas.bind("<Left>", lambda event: self.translate(-0.2, 0, 0))
-        self.canvas.bind("<space>", lambda event: self.translate(0, 0, 0.2))
-        self.canvas.bind("<BackSpace>", lambda event: self.translate(0, 0, -0.2))
-
-        self.canvas.bind('w', lambda event: self.rotate(1, 0, 0))
-        self.canvas.bind('s', lambda event: self.rotate(-1, 0, 0))
-        self.canvas.bind('d', lambda event: self.rotate(0, 1, 0))
-        self.canvas.bind('a', lambda event: self.rotate(0, -1, 0))
-        self.canvas.bind('z', lambda event: self.rotate(0, 0, 1))
-        self.canvas.bind('<Shift-Z>', lambda event: self.rotate(0, 0, -1))
-
         self.canvas.bind("l", lambda event: [self.exec("light.lum += 1", {'light': light})
                                              for light in self.space.lights])
         self.canvas.bind("<Shift-L>", lambda event: [self.exec("light.lum -= 1", {'light': light})
                                                      for light in self.space.lights])
-        self.canvas.bind("c", lambda event: self.exec("self.camera.clarity += 0.01"))
-        self.canvas.bind("<Shift-C>", lambda event: self.exec("self.camera.clarity -= 0.01"))
-        self.canvas.bind("t", lambda event: self.exec("self.camera.shutter += 0.01"))
-        self.canvas.bind("<Shift-T>", lambda event: self.exec("self.camera.shutter -= 0.01"))
+        self.canvas.bind("c", lambda event: self.exec("self.camera.clarity += 0.1"))
+        self.canvas.bind("<Shift-C>", lambda event: self.exec("self.camera.clarity -= 0.1"))
+        self.canvas.bind("t", lambda event: self.exec("self.camera.shutter += 0.1"))
+        self.canvas.bind("<Shift-T>", lambda event: self.exec("self.camera.shutter -= 0.1"))
 
         self.canvas.bind("h", lambda event: self.exec("self.hl.reverse()"))
 
     def model_it(self):
         self._set_offset()
         self.space = rd.Space((self.canvas.winfo_width(), self.canvas.winfo_height()))
-        self.srz_info = eval(self.side.get()), eval(self.radius.get()), eval(self.separation.get())
+        if int(self.side.get()) > 36:
+            self.side.delete(0, 'end')
+            self.side.insert(0, '36')
+        self.srzc_info = eval(self.side.get()), eval(self.radius.get()), \
+                         eval(self.separation.get()), self.color.get()
         if not self.loaded:
             self.load_button.configure(text='Load')
         else:
             self.loaded = False
-        self.object = gn.Spawn.parallelopiped(*self.srz_info)
-        self.camera = rd.Camera(shutter=2, clarity=4)
-        obj_center = self.object.vectors.mean(axis=0)
+        self.object = gn.Spawn.parallelopiped(*self.srzc_info[:3])
+        self.camera = rd.Camera(shutter=2, clarity=6)
+        obj_center = self.object.vectors.mean(axis=0).transpose()[0][:3]
         self.space.add_object(self.object, location=(0, 0, 0))
         cam_d = rd.np.max(rd.np.sum(rd.np.square(self.object.vectors), axis=1)) ** 0.5
-        location = (obj_center[:3]).transpose()[0] + [0, -4 * cam_d, 0]
-        self.light = rd.Light(1, 2 * rd.np.linalg.norm(location))
-        self.space.add_camera(self.camera, location=location, orient=(0, 1, 0.))
+        location = obj_center + [0, -4 * cam_d, -5 / 2 * cam_d]
+        self.light = rd.Light(1, 2.5 * rd.np.linalg.norm(location))
+        self.space.add_camera(self.camera, location=location, orient=-location / rd.np.linalg.norm(location))
         self.space.add_light(self.light, location=location)
 
         self.fov_bar_x.set(self.camera.fov[0])
@@ -145,6 +193,8 @@ class Main(gui.GUI):
         if self.space.screen != (self.canvas.winfo_width(), self.canvas.winfo_height())
         else None)
         self.key_bind()
+        self.canvas.bind("<KeyPress>", lambda event: self.key_pressed(event))
+        self.canvas.bind("<KeyRelease>", lambda event: self.key_released(event))
         self.canvas.focus_set()
 
         self.smart_loop()
