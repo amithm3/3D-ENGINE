@@ -41,7 +41,7 @@
   ![10.3](__data__/assets/Screenshot%20(13).png)
 * #### That's not it
   - Use UpArrow, DownArrow, LeftArrow, RightArrow key to move the Camera
-  - Use 'w', 's', 'a', 'd' keys to rotate the camera in up, down, left, right directions
+  - Use 'w', 's', 'a', 'd', 'z', 'x' keys to rotate the camera in up-down, left-right, clockwise-anticlockwise directions
   - Can't see Your 3D Object clearly, or it's too bright, use 't', 'SHIFT-T'(shutter sensitivity) or
     'l', 'SHIFT-L'(light source) or 'c', SHIFT-C(clarity) to change lighting
 
