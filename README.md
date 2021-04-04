@@ -5,7 +5,7 @@
 ---
 ### How To Install
 * #### _Make sure pip is installed in your system, else install pip before proceeding(skip for the venv and exe versions)_
-* #### _Download the zip file from [Download v1.4.3](https://github.com/Amith225/3D-ENGINE/archive/v1.4.3.zip)(source codeonly) or <br>[Download v1.0-venv](https://github.com/Amith225/3D-ENGINE/archive/v1.0.zip)(with the venv, no dependency)(not recommended)(old version) or <br>[Download v1.4.3-exe](https://github.com/Amith225/3D-ENGINE/archive/v1.4.3-exe.zip)(stand-alone executable)_
+* #### _Download the zip file from [Download v1.4.3](https://github.com/Amith225/3D-ENGINE/archive/v1.4.3.zip)(source codeonly) or <br> &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [Download v1.0-venv](https://github.com/Amith225/3D-ENGINE/archive/v1.0.zip)(with the venv, no dependency)(not recommended)(old version) or <br>[Download v1.4.3-exe](https://github.com/Amith225/3D-ENGINE/archive/v1.4.3-exe.zip)(stand-alone executable)_
 * #### _After Installing open cmd inside the 3D-ENGINE folder and run ```pip install -r requirements.txt``` (only for source code version)_
 * #### _If using virtual environment(setup by you) run the command through it_
 * #### _Finally to see the demo run demo.py in the scr. Use the renderer.py as a library_
@@ -40,7 +40,7 @@
   ![10.2](__data__/assets/Screenshot%20(12).png)
   ![10.3](__data__/assets/Screenshot%20(13).png)
 * #### That's not it
-  - Use UpArrow, DownArrow, LeftArrow, RightArrow key to move the Camera
+  - Use UpArrow, DownArrow, LeftArrow, RightArrow key to move the Camera&emsp;&emsp;&emsp;&emsp;
   - Use 'w', 's', 'a', 'd', 'z', 'x' keys to rotate the camera in up-down, left-right, clockwise-anticlockwise directions
   - Can't see Your 3D Object clearly, or it's too bright, use 't', 'SHIFT-T'(shutter sensitivity) or
     'l', 'SHIFT-L'(light source) or 'c', SHIFT-C(clarity) to change lighting
