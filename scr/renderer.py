@@ -3,7 +3,7 @@ import numpy as np
 
 class Space:
     def __init__(self, screen, unit=250):
-        self.screen = screen
+        self.screen = screen  # screen width, height
         self.unit = unit
 
         self.objects = []
@@ -32,8 +32,9 @@ class Camera:
         self.z_near = z_near
         self.shutter = shutter
         self.clarity = clarity
-        self.thresh = 'doti > 0'
+        self.thresh = 'doti > 0'  # will be evaluated(eval) for see through or normal view effect
 
+        # class variables initialization
         self.space = None
         self.location = None
         self.cost = 0
@@ -45,6 +46,7 @@ class Camera:
         self.up = None
         self.right = None
 
+    # will be evaluated(eval) for see through or normal view effect
     def thresh_set(self, val):
         if val == 0:
             self.thresh = 'doti > 0'
@@ -105,8 +107,10 @@ class Camera:
             point_indexes = []
             p1i, p2i, p3i = obj.vectors[obj.faces.transpose()]
             side1i, side2i = p1i[:, :3] - [p2i[:, :3], p3i[:, :3]]
-            normal_i = np.cross(side1i, side2i, axis=1)
-            midi = (p1i + p2i + p3i) / 3 + obj.location
+            normal_i = np.cross(side1i, side2i, axis=1)  # normal of triangular side
+            midi = (p1i + p2i + p3i) / 3 + obj.location  # mid-point of triangular side
+
+            # calculates orientation of object if asked
             if capture_orient:
                 orient = np.einsum('ij,jk,lkm->lim',
                                    self.projection_matrix,
@@ -115,12 +119,14 @@ class Camera:
                                    obj.location - self.location)
                 orient *= self.space.unit / orient[:, 3, np.newaxis]
                 orient_cluster.append(orient)
-            cam_prospect_i = (midi - self.location)[:, :3]
-            forward_prospect_i = np.einsum('ij,lik->lk', self.forward[:3], cam_prospect_i)
-            doti = np.einsum('lij,lik->lk', normal_i, cam_prospect_i)
-            z_buffer_i = np.linalg.norm(cam_prospect_i, axis=1)
 
+            #  required calculation to determine the visibility of faces for drawing
+            cam_prospect_i = (midi - self.location)[:, :3]  # object-cam vector
+            forward_prospect_i = np.einsum('ij,lik->lk', self.forward[:3], cam_prospect_i)  # object-cam projection
+            doti = np.einsum('lij,lik->lk', normal_i, cam_prospect_i)  # object-normal projection onto object-cam vector
+            z_buffer_i = np.linalg.norm(cam_prospect_i, axis=1)  # z distance of object wrt camera orientation
             fov_val = z_buffer_i * self.fov_cos
+            #  check various conditions for visibility and extract required faces for further calculation
             visible_indices = ((eval(self.thresh, {'doti': doti})) & ((forward_prospect_i > fov_val[:, [0]]) |
                                                                       (forward_prospect_i > fov_val[:, [1]])) &
                                (z_buffer_i > self.z_near) & (z_buffer_i < self.z_far)).transpose()[0]
@@ -135,17 +141,20 @@ class Camera:
             light_prospect_i[light_prospect_i > 1] = 1
             light_prospect_i[light_prospect_i < 0] = 0
 
+            #  extract faces to be drawn and provide lighting info with z_buffer
             for fi in range(len(visible_faces)):
                 face = visible_faces[fi]
                 point_indexes.extend([f for f in face if f not in point_indexes])
                 faces.append([[point_indexes.index(p) + len(points_cluster) for p in face],
                               light_prospect_i[fi][0], z_buffer_i[fi]])
 
+            #  final calculation for 2d projection onto screen
             points = np.einsum('ij,jk,lkm->lim',
                                self.projection_matrix,
                                self.camera_matrix,
                                obj.vectors[point_indexes] + obj.location - self.location)
             points *= self.space.unit / points[:, 3, np.newaxis]
+
             points_cluster.extend(points)
             faces_cluster.extend(faces)
 
